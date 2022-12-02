@@ -1,18 +1,30 @@
-import { Function } from 'aws-cdk-lib/aws-lambda';
+import { Stack } from 'aws-cdk-lib';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { join } from 'path';
 
 type LambdaProps = {
-	dbName: string;
+    env: string
+	model: string;
 	method: string;
 };
 
 class GenericLambda {
-	constructor(props: LambdaProps) {
-		this.initialize(props);
+	private stack: Stack;
+	private props: LambdaProps;
+	constructor(stack:Stack, props: LambdaProps) {
+        this.stack =stack
+        this.props = props
+		this.initialize();
 	}
 
-	private initialize(props: LambdaProps) {
-		this.createLambda(props);
+	private initialize() {
+		this.createLambda();
 	}
 
-	private createLambda(props: LambdaProps) {}
+	private createLambda() {
+        const lambdaId = `${this.props.env}-${this.props.model}`;
+        return new NodejsFunction(this.stack,lambdaId,{
+
+        })
+    }
 }
