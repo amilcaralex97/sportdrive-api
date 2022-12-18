@@ -6,9 +6,7 @@ let conn = null;
 
 const uri = `mongodb+srv://${process.env.AWS_ACCESS_KEY}:${process.env.AWS_SECRET_KEY}@sportdrive-dev-cluster.dkvgtfh.mongodb.net/?authSource=%24external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority`;
 
-async function handler(event: any, context: any) {
-	context.callbackWaitsForEmptyEventLoop = false;
-
+export async function dbConnection() {
 	if ((conn = null)) {
 		conn = mongoose
 			.connect(uri, {
@@ -19,5 +17,3 @@ async function handler(event: any, context: any) {
 
 	return conn;
 }
-
-export { handler };
