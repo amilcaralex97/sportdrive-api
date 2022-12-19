@@ -8,11 +8,10 @@ const uri = `mongodb+srv://${process.env.AWS_ACCESS_KEY}:${process.env.AWS_SECRE
 
 export async function dbConnection() {
 	if ((conn = null)) {
-		conn = mongoose
-			.connect(uri, {
-				serverSelectionTimeoutMS: 5000,
-			})
-			.then(() => mongoose);
+		console.log('establishing new connection to DB');
+		conn = await mongoose.connect(uri, {
+			serverSelectionTimeoutMS: 5000,
+		});
 	}
 
 	return conn;
