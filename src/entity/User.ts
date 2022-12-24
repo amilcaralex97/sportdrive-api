@@ -1,4 +1,5 @@
 import { Schema, model, Types } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 interface IUser {
 	userId: string;
@@ -8,11 +9,20 @@ interface IUser {
 	roleId: Types.ObjectId;
 }
 
-const userSchema = new Schema<IUser>({
-	username: { type: String, required: true },
-	name: { type: String, required: true },
-	password: { type: String, required: true },
-	roleId: { type: Schema.Types.ObjectId, required: true },
-});
+const userSchema = new Schema(
+	{
+		username: { type: String, required: true },
+		name: { type: String, required: true },
+		password: { type: String, required: true },
+		roleId: { type: Schema.Types.ObjectId, required: true },
+	},
+	{
+		_id: false,
+		userId: {
+			type: String,
+			default: uuidv4,
+		},
+	}
+);
 
-export const User = model('User', userSchema);
+export const User = model<IUser>('User', userSchema);
