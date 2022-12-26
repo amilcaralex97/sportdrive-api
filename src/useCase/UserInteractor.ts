@@ -5,6 +5,11 @@ class UserInteractor {
 	public GetUsers() {}
 
 	/**
+	 * GetUser
+	 */
+	public GetUser() {}
+
+	/**
 	 * CreateUser
 	 */
 	public CreateUser() {}
