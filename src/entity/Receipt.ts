@@ -1,10 +1,53 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
 interface IReceipt {
-	roleId: String;
-	userAccess: number;
-	receiptAccess: number;
+	receiptId: String;
+	certificateId: Types.ObjectId;
+	clientName: String;
+	clientPhone: String;
+	clientEmail: String;
+	receiptDate: String;
+	arriveTime: String;
+	installationTime: String;
+	vehicleBrand: String;
+	vehicleModel: String;
+	vehicleTransmission: String;
+	vehicleType: String;
+	gasType: String;
+	gasTank: String;
+	vehicleVin: String;
+	vehicleYear: String;
+	vehicleEngine: String;
+	vehicleKm: String;
+	vehicleCylinder: String;
+	vehiclePlate: String;
+	topSport: Boolean;
+	topBoost: Boolean;
+	topBoostPart: String;
+	topBoostPro: Boolean;
+	topBoostProPart: String;
+	otherProduct: String;
+	checkEngine: Boolean;
+	epc: Boolean;
+	abs: Boolean;
+	asr: Boolean;
+	airBag: Boolean;
+	tirePressure: Boolean;
+	antiTheft: Boolean;
+	battery: Boolean;
+	brakes: Boolean;
+	reqService: Boolean;
+	vehicleStatusDescription: String;
+	scanBeforeDescription: String;
+	reviewVehicleStart: String;
+	reviewVehicleResponse: String;
+	reviewFunctionality: String;
+	reviewService: String;
+	reviewTime: String;
+	reviewRecommendation: String;
+	receiptUrl: String;
+	draft: Boolean;
 }
 
 const receiptSchema = new Schema(
@@ -145,7 +188,7 @@ const receiptSchema = new Schema(
 		reviewTime: {
 			type: String,
 		},
-		reviewRecomendation: {
+		reviewRecommendation: {
 			type: String,
 		},
 		receiptUrl: {
@@ -154,6 +197,10 @@ const receiptSchema = new Schema(
 		draft: {
 			type: Boolean,
 			default: false,
+		},
+		certificateId: {
+			type: Schema.Types.ObjectId,
+			ref: 'Certificate',
 		},
 	},
 	{
