@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
 interface IRole {
@@ -11,6 +11,12 @@ const roleSchema = new Schema(
 	{
 		userAccess: { type: String, required: true },
 		receiptAccess: { type: Number, required: true },
+		users: [
+			{
+				type: Types.ObjectId,
+				ref: 'User',
+			},
+		],
 	},
 	{
 		_id: false,
