@@ -23,4 +23,9 @@ class UserInteractor {
 	 * DeleteUser
 	 */
 	public DeleteUser() {}
+
+	/**
+	 * SeedUser
+	 */
+	public SeedUser() {}
 }
