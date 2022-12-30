@@ -5,12 +5,13 @@ export interface IRole {
 	roleId?: string;
 	userAccess: number;
 	receiptAccess: number;
+	users?: Types.ObjectId[];
 }
 
 const roleSchema = new Schema(
 	{
-		userAccess: { type: String, required: true },
-		receiptAccess: { type: Number, required: true },
+		userAccess: { type: String, required: true, max: 8, min: 0 },
+		receiptAccess: { type: Number, required: true, max: 8, min: 0 },
 		users: [
 			{
 				type: Types.ObjectId,
