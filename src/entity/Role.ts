@@ -1,8 +1,8 @@
 import { Schema, model, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
-interface IRole {
-	roleId: string;
+export interface IRole {
+	roleId?: string;
 	userAccess: number;
 	receiptAccess: number;
 }
