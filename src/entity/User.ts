@@ -1,8 +1,8 @@
 import { Schema, model, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
-interface IUser {
-	userId: string;
+export interface IUser {
+	userId?: string;
 	username: string;
 	name: string;
 	password: string;
