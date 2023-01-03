@@ -25,6 +25,7 @@ const roleSchema = new Schema(
 			type: String,
 			default: uuidv4,
 		},
+		timestamps: true,
 	}
 );
 

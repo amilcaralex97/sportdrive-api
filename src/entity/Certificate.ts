@@ -18,6 +18,7 @@ const certificateSchema = new Schema(
 			type: String,
 			default: uuidv4,
 		},
+		timestamps: true,
 	}
 );
 

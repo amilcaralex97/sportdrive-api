@@ -209,6 +209,7 @@ const receiptSchema = new Schema(
 			type: String,
 			default: uuidv4,
 		},
+		timestamps: true,
 	}
 );
 
