@@ -1,6 +1,11 @@
-import { User } from '../entity/User';
+import { IUser, User } from '../entity/User';
 
 export class UserController {
+	private userProps: IUser;
+	constructor(userProps: IUser) {
+		this.userProps = userProps;
+	}
+
 	/**
 	 * fetchUsers
 	 */
@@ -11,6 +16,6 @@ export class UserController {
 	 */
 	public async createUser() {
 		const user = new User();
-		return user;
+		await user.save();
 	}
 }
