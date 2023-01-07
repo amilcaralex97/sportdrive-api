@@ -1,17 +1,11 @@
 import { APIGatewayEvent } from 'aws-lambda';
 import { verify } from 'argon2';
-import { IUser, User } from '../entity/User';
+import { IUser, User } from '../../entity/User';
 import { sign, SignOptions } from 'jsonwebtoken';
-import { resolve } from 'dns';
+import { AuthControllerInterface, SignInRequest } from './AuthControllerTypes';
 
-interface SignInRequest {
-	userName: string;
-	password: string;
-}
-
-export class AuthController {
+export class AuthController implements AuthControllerInterface {
 	private event: APIGatewayEvent;
-	private body: SignInRequest;
 
 	constructor(event: APIGatewayEvent) {
 		this.event = event;
@@ -22,11 +16,13 @@ export class AuthController {
 	 */
 	public async signIn() {
 		let body: SignInRequest;
+		let jwtToken;
+		let user;
 		if (this.event.body) {
 			body = JSON.parse(this.event.body);
 			const { userName, password } = body;
 			try {
-				const user = await User.findOne({ userName });
+				user = await User.findOne({ userName });
 
 				if (!user) {
 					return {
@@ -44,13 +40,18 @@ export class AuthController {
 					};
 				}
 
-				const jwtToken = this.generateToken(user);
-
-				return { token: jwtToken, userId: user.userId };
+				jwtToken = this.generateToken(user);
 			} catch (error) {
 				return { status: 500, message: 'Error en login' };
 			}
+			return {
+				token: jwtToken,
+				userId: user.userId,
+				status: 200,
+				message: 'Login exitoso',
+			};
 		}
+		return { status: 500, message: 'Error en login' };
 	}
 
 	private generateToken(user: IUser) {
