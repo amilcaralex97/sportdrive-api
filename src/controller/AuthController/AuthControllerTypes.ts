@@ -10,6 +10,13 @@ export type SignInDTO = {
 	userId?: string;
 };
 
+export type VerifyDTO = {
+	status: number;
+	message: string;
+	isVerified: boolean;
+};
+
 export interface AuthControllerInterface {
 	signIn: () => Promise<SignInDTO>;
+	verify: () => VerifyDTO;
 }

@@ -71,9 +71,17 @@ export class AuthController implements AuthControllerInterface {
 	 */
 	public verify() {
 		try {
-			return true;
+			return {
+				status: 200,
+				message: 'Usuario Verificado',
+				isVerified: true,
+			};
 		} catch (error) {
-			return { status: 500, message: 'Error en login' };
+			return {
+				status: 500,
+				message: 'Error en login',
+				isVerified: false,
+			};
 		}
 	}
 }
