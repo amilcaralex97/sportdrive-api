@@ -1,3 +1,3 @@
 interface IAuthInteractor {
-	Login: () => any;
+	Login: () => Promise<any>;
 }
