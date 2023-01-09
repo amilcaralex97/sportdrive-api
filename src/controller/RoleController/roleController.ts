@@ -12,12 +12,17 @@ export class RoleController {
 	public async fetchRoles() {}
 
 	/**
+	 * fetchRole
+	 */
+	public fetchRole() {}
+
+	/**
 	 * createUser
 	 */
 	public async createRole() {
 		let role;
 		try {
-			role = new Role({ ...this.roleProps });
+			role = new Role(this.roleProps);
 			await role.save();
 		} catch (error) {
 			throw new Error('Error while trying to create role');
