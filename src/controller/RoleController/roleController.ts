@@ -1,4 +1,4 @@
-import { IRole, Role } from '../entity/Role';
+import { IRole, Role } from '../../entity/Role';
 
 export class RoleController {
 	private roleProps: IRole;

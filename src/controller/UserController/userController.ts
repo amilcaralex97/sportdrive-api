@@ -1,4 +1,4 @@
-import { IUser, User } from '../entity/User';
+import { IUser, User } from '../../entity/User';
 
 export class UserController {
 	private userProps: IUser;
