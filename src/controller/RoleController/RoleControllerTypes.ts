@@ -1,3 +1,5 @@
+import { IRole } from '../../entity/Role';
+
 export type CreateRoleRequest = {
 	userName: string;
 	password: string;
@@ -6,8 +8,9 @@ export type CreateRoleRequest = {
 export type RoleDTO = {
 	status: number;
 	message: string;
-	token?: string;
-	userId?: string;
+	roles?: IRole[];
+	role?: IRole;
+	roleId?: string;
 };
 
 export interface IRoleController {
