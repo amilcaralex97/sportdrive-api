@@ -28,7 +28,7 @@ export class RoleController implements IRoleController {
 	 * fetchRole
 	 */
 	public async fetchRole() {
-		let role;
+		let role: IRole | null;
 		try {
 			role = await Role.findById(this.roleProps.roleId).exec();
 		} catch (error) {
@@ -37,9 +37,18 @@ export class RoleController implements IRoleController {
 				message: `Error al obtener rol ${this.roleProps.roleId || ''}`,
 			};
 		}
+
+		if (role) {
+			return {
+				status: 200,
+				message: 'Rol obtenido exitosamente',
+				role,
+			};
+		}
+
 		return {
-			status: 200,
-			message: 'Roles obtenido exitosamente',
+			status: 400,
+			message: `Error al obtener rol ${this.roleProps.roleId || ''}`,
 		};
 	}
 
@@ -52,9 +61,46 @@ export class RoleController implements IRoleController {
 			role = new Role(this.roleProps);
 			await role.save();
 		} catch (error) {
-			throw new Error('Error while trying to create role');
+			return {
+				status: 500,
+				message: 'Error al crear rol',
+			};
 		}
 
-		return role;
+		return {
+			status: 200,
+			message: 'Rol creado exitosamente',
+			role,
+		};
+	}
+
+	/**
+	 * updateRole
+	 */
+	public async updateRole() {
+		let role: IRole | null;
+		try {
+			role = await Role.findOneAndUpdate(
+				{ roleId: this.roleProps.roleId },
+				this.roleProps
+			);
+		} catch (error) {
+			return {
+				status: 500,
+				message: 'Error al actualizar rol',
+			};
+		}
+
+		if (role) {
+			return {
+				status: 200,
+				message: 'Rol actualizado exitosamente',
+				role,
+			};
+		}
+		return {
+			status: 400,
+			message: `Error al obtener rol ${this.roleProps.roleId || ''}`,
+		};
 	}
 }

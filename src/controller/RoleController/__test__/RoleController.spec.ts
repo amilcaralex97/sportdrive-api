@@ -13,4 +13,9 @@ describe('RoleController', () => {
 		it('Should return a specific role', () => {});
 		it('Should return an error > 400 when there is an error', () => {});
 	});
+
+	describe('updateRole', () => {
+		it('Should update a role', () => {});
+		it('Should return an error when a role is not created', () => {});
+	});
 });
