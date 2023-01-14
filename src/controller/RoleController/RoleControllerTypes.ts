@@ -1,8 +1,10 @@
 import { IRole } from '../../entity/Role';
 
-export type CreateRoleRequest = {
-	userName: string;
-	password: string;
+export type RoleRequest = {
+	userAccess: number;
+	receiptAccess: number;
+	userId?: string;
+	roleId?: string;
 };
 
 export type RoleDTO = {

@@ -1,9 +1,9 @@
 import { IRole, Role } from '../../entity/Role';
-import { IRoleController } from './RoleControllerTypes';
+import { IRoleController, RoleRequest } from './RoleControllerTypes';
 
 export class RoleController implements IRoleController {
-	private roleProps: IRole;
-	constructor(roleProps: IRole) {
+	private roleProps: RoleRequest;
+	constructor(roleProps: RoleRequest) {
 		this.roleProps = roleProps;
 	}
 
