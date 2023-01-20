@@ -1,4 +1,10 @@
-class RoleInteractor {
+import { Role, IRole } from '../entity/Role';
+
+export class RoleInteractor {
+	private roleProps;
+	constructor(roleProps: IRole) {
+		this.roleProps = roleProps;
+	}
 	/**
 	 * GetRoles
 	 */
@@ -12,7 +18,11 @@ class RoleInteractor {
 	/**
 	 * CreateRole
 	 */
-	public CreateRole() {}
+	public async CreateRole() {
+		let role;
+		try {
+		} catch (error) {}
+	}
 
 	/**
 	 * UpdateRole
