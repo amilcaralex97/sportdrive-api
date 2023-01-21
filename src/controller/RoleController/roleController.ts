@@ -59,7 +59,7 @@ export class RoleController implements IRoleController {
 		let role;
 		try {
 			role = new Role(this.roleProps);
-			await role.save();
+			role = await role.save();
 		} catch (error) {
 			return {
 				status: 500,
