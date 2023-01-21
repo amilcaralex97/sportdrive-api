@@ -3,8 +3,13 @@ import { RoleController } from '../RoleController';
 import { roleMocks } from './mocks';
 
 describe('RoleController', () => {
+	const mockReq = roleMocks.createRandomRoleReq();
+	const mockResFind = [
+		roleMocks.createRandomRole(),
+		roleMocks.createRandomRole(),
+	];
 	beforeEach(() => {
-		Role.find = jest.fn().mockReturnValue({ test: 'test' });
+		Role.find = jest.fn().mockReturnValue([...mockResFind]);
 	});
 	describe('createRole', () => {
 		it('Should Create Role successfully', async () => {
@@ -17,9 +22,22 @@ describe('RoleController', () => {
 		it('Should return all roles', async () => {
 			const roles = new RoleController({});
 			const res = await roles.fetchRoles();
-			expect(res).toEqual({});
+			expect(res).toEqual({
+				message: 'Roles obtenidos con exitosamente',
+				roles: mockResFind,
+				status: 200,
+			});
 		});
-		it('Should return an error > 400 when there is an error', async () => {});
+		it('Should return an error > 400 when there is an error', async () => {
+			Role.find = jest.fn().mockReturnValue([...mockResFind]);
+			const roles = new RoleController({});
+			const res = await roles.fetchRoles();
+			expect(res).toEqual({
+				message: 'Roles obtenidos con exitosamente',
+				roles: mockResFind,
+				status: 200,
+			});
+		});
 	});
 
 	describe('fetchRole', () => {
