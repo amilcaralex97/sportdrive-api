@@ -18,10 +18,12 @@ describe('RoleController', () => {
 		roleId,
 	};
 	beforeEach(() => {
-		Role.find = jest.fn().mockReturnValue([...mockResFind]);
-		Role.prototype.save = jest.fn().mockReturnValue({});
+		jest.resetAllMocks();
 	});
 	describe('createRole', () => {
+		beforeEach(() => {
+			Role.prototype.save = jest.fn().mockReturnValue({});
+		});
 		it('Should Create Role successfully', async () => {
 			Role.prototype.save = jest.fn().mockReturnValue(roleMock);
 			let roleController = new RoleController(mockReq);
@@ -44,6 +46,9 @@ describe('RoleController', () => {
 	});
 
 	describe('fetchRoles', () => {
+		beforeEach(() => {
+			Role.find = jest.fn().mockReturnValue([...mockResFind]);
+		});
 		it('Should return all roles', async () => {
 			const roles = new RoleController({});
 			const res = await roles.fetchRoles();
@@ -65,12 +70,35 @@ describe('RoleController', () => {
 	});
 
 	describe('fetchRole', () => {
-		it('Should return a specific role', () => {});
-		it('Should return an error > 400 when there is an error', async () => {});
+		beforeEach(() => {
+			Role.findById = jest
+				.fn()
+				.mockResolvedValue({ ...roleMock, roleId });
+		});
+		it('Should return a specific role', async () => {
+			let fetchRoleRequest = { ...mockReq, roleId };
+
+			let roleController = new RoleController(fetchRoleRequest);
+			let role = await roleController.fetchRole();
+			expect(role).toEqual({
+				message: 'Rol obtenido exitosamente',
+				role: roleMock,
+				status: 200,
+			});
+		});
+		it('Should return an error > 400 when there is an error', async () => {
+			Role.findById = jest.fn().mockRejectedValueOnce({ error: 'error' });
+			const roles = new RoleController({});
+			const res = await roles.fetchRole();
+			expect(res).toEqual({
+				status: 500,
+				message: 'Error al obtener rol ',
+			});
+		});
 	});
 
 	describe('updateRole', () => {
-		it('Should update a role', () => {});
+		it('Should update a role', async () => {});
 		it('Should return an error when a role is not created', async () => {});
 	});
 });

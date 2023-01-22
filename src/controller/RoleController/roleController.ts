@@ -30,7 +30,7 @@ export class RoleController implements IRoleController {
 	public async fetchRole() {
 		let role: IRole | null;
 		try {
-			role = await Role.findById(this.roleProps.roleId).exec();
+			role = await Role.findById(this.roleProps?.roleId);
 		} catch (error) {
 			return {
 				status: 500,
