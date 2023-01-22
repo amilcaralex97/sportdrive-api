@@ -7,5 +7,7 @@ export default function createRandomRole(): IRole {
 		receiptAccess: faker.datatype.number({ min: 0, max: 8 }),
 		roleId: faker.datatype.uuid(),
 		users: [faker.datatype.uuid()],
+		createdAt: faker.date.past(),
+		updatedAt: faker.date.recent(),
 	};
 }

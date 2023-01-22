@@ -98,7 +98,32 @@ describe('RoleController', () => {
 	});
 
 	describe('updateRole', () => {
-		it('Should update a role', async () => {});
-		it('Should return an error when a role is not created', async () => {});
+		beforeEach(() => {
+			Role.findOneAndUpdate = jest
+				.fn()
+				.mockResolvedValue({ ...roleMock, roleId });
+		});
+		it('Should update a role', async () => {
+			let updateRoleRequest = { ...mockReq, roleId };
+
+			let roleController = new RoleController(updateRoleRequest);
+			let role = await roleController.updateRole();
+			expect(role).toEqual({
+				message: 'Rol actualizado exitosamente',
+				role: roleMock,
+				status: 200,
+			});
+		});
+		it('Should return an error when a role is not created', async () => {
+			Role.findOneAndUpdate = jest
+				.fn()
+				.mockRejectedValueOnce({ error: 'error' });
+			const roles = new RoleController({});
+			const res = await roles.updateRole();
+			expect(res).toEqual({
+				status: 500,
+				message: 'Error al actualizar rol',
+			});
+		});
 	});
 });

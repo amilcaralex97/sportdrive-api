@@ -82,7 +82,8 @@ export class RoleController implements IRoleController {
 		try {
 			role = await Role.findOneAndUpdate(
 				{ roleId: this.roleProps.roleId },
-				this.roleProps
+				{ $set: this.roleProps },
+				{ new: true }
 			);
 		} catch (error) {
 			return {

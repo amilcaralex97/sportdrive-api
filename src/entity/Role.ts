@@ -6,6 +6,8 @@ export interface IRole {
 	userAccess: number;
 	receiptAccess: number;
 	users?: string[];
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 
 const roleSchema = new Schema(
