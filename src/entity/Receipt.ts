@@ -1,9 +1,9 @@
 import { Schema, model, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
-interface IReceipt {
+export interface IReceipt {
 	receiptId: String;
-	certificateId: Types.ObjectId;
+	certificateId: String;
 	clientName: String;
 	clientPhone: String;
 	clientEmail: String;
@@ -199,7 +199,7 @@ const receiptSchema = new Schema(
 			default: false,
 		},
 		certificateId: {
-			type: Schema.Types.ObjectId,
+			type: String,
 			ref: 'Certificate',
 		},
 	},
