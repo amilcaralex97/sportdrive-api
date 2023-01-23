@@ -1,7 +1,7 @@
-import createMockUserRequest from './createUser.ts'
-import createMockUser from './userRequest.ts'
+import { createMockUser } from './createUser';
+import { createMockUserRequest } from './userRequest';
 
 export const userMocks = {
-    createMockUserRequest,
-    createMockUser
-}
+	createMockUserRequest,
+	createMockUser,
+};
