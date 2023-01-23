@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 interface ICertificate {
 	certificateId: string;
 	certificateUrl: string;
-	receiptId: Types.ObjectId;
+	receiptId: string;
 }
 
 const certificateSchema = new Schema(
@@ -22,4 +22,7 @@ const certificateSchema = new Schema(
 	}
 );
 
-export const Role = model<ICertificate>('Certificate', certificateSchema);
+export const Certificate = model<ICertificate>(
+	'Certificate',
+	certificateSchema
+);
