@@ -5,8 +5,8 @@ export type CreateUserRequest = {
 	userName: string;
 	name: string;
 	password: string;
-	roleId?: Types.ObjectId;
-	userId?: Types.ObjectId;
+	roleId?: string;
+	userId?: string;
 };
 
 export type UserDTO = {

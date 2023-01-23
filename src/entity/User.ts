@@ -14,7 +14,7 @@ const userSchema = new Schema(
 		userName: { type: String, required: true },
 		name: { type: String, required: true },
 		password: { type: String, required: true },
-		roleId: { type: Schema.Types.ObjectId, ref: 'Role' },
+		roleId: { type: String, ref: 'Role' },
 	},
 	{
 		_id: false,
