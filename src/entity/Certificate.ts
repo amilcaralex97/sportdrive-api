@@ -1,7 +1,7 @@
 import { Schema, model, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
-interface ICertificate {
+export interface ICertificate {
 	certificateId: string;
 	certificateUrl: string;
 	receiptId: string;

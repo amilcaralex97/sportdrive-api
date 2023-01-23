@@ -1,8 +1,8 @@
+import { Certificate } from '../../../../entity/Certificate';
 const faker = require('@faker-js/faker');
 const { v4: uuidv4 } = require('uuid');
-import { Certificate } from '../../../../entity/Certificate';
 
-export const createMockCertificateHelper = () => {
+export const createMockCertificate = () => {
 	return new Certificate({
 		certificateUrl: faker.internet.url(),
 		receiptId: uuidv4(),
