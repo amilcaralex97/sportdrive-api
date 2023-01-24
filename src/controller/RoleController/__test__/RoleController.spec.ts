@@ -3,7 +3,6 @@ import { RoleController } from '../RoleController';
 import { roleMocks } from './mocks';
 
 Role.prototype.save = jest.fn();
-
 describe('RoleController', () => {
 	const mockReq = roleMocks.createRandomRoleReq();
 	const mockResFind = [

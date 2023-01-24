@@ -1,13 +1,12 @@
 import { CreateUserRequest } from '../../UserControllerTypes';
-const faker = require('@faker-js/faker');
-const { v4: uuidv4 } = require('uuid');
+import { faker } from '@faker-js/faker';
 
 export const createMockUserRequest = (): CreateUserRequest => {
 	return {
 		userName: faker.internet.userName(),
-		name: faker.name.findName(),
+		name: faker.name.fullName(),
 		password: faker.internet.password(),
-		roleId: uuidv4(),
-		userId: uuidv4(),
+		roleId: faker.datatype.uuid(),
+		userId: faker.datatype.uuid(),
 	};
 };

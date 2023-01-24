@@ -1,10 +1,9 @@
-import { Types } from 'mongoose';
 import { IUser } from '../../entity/User';
 
 export type CreateUserRequest = {
-	userName: string;
-	name: string;
-	password: string;
+	userName?: string;
+	name?: string;
+	password?: string;
 	roleId?: string;
 	userId?: string;
 };
