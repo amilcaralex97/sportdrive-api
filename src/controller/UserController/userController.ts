@@ -1,9 +1,11 @@
-import {  User } from '../../entity/User';
+import mongoose from 'mongoose';
+import { User } from '../../entity/User';
 import { CreateUserRequest } from './UserControllerTypes';
 
 export class UserController {
 	private userProps: CreateUserRequest;
-	constructor(userProps: CreateUserRequest) {
+	private db: typeof mongoose;
+	constructor(userProps: CreateUserRequest, db: typeof mongoose) {
 		this.userProps = userProps;
 	}
 
@@ -11,9 +13,9 @@ export class UserController {
 	 * fetchUsers
 	 */
 	public async fetchUsers() {
-		let users
+		let users;
 		try {
-			users = await User.find()
+			users = await User.find();
 		} catch (error) {
 			return { status: 500, message: 'Error al obtener los usuarios' };
 		}
@@ -33,7 +35,7 @@ export class UserController {
 	 * createUser
 	 */
 	public async createUser() {
-		let user
+		let user;
 		try {
 			user = new User(this.userProps);
 			user = await user.save();

@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker';
 export const createMockUser = () => {
 	return new User({
 		userName: faker.internet.userName(),
-		name: faker.name.findName(),
+		name: faker.name.fullName(),
 		password: faker.internet.password(),
 		roleId: faker.datatype.uuid(),
 		userId: faker.datatype.uuid(),
