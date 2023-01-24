@@ -33,8 +33,21 @@ export class UserController {
 	 * createUser
 	 */
 	public async createUser() {
-		const user = new User();
-		await user.save();
+		let user
+		try {
+			user = new User(this.userProps);
+			user = await user.save();
+		} catch (error) {
+			return {
+				status: 500,
+				message: 'Error al crear user',
+			};
+		}
+		return {
+			status: 200,
+			message: 'User creado exitosamente',
+			user,
+		};
 	}
 
 	/**
