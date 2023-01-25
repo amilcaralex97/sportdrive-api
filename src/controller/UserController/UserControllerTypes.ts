@@ -1,4 +1,12 @@
-import { IUser } from '../../entity/User';
+export interface IUser {
+	userName: string;
+	name: string;
+	password: string;
+	roleId: string;
+	userId: string;
+	createdAt: Date;
+	updatedAt: Date;
+}
 
 export type CreateUserRequest = {
 	userName?: string;

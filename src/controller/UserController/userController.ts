@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { userSchema } from '../../entity/User';
-import { CreateUserRequest } from './UserControllerTypes';
+import { CreateUserRequest, IUser } from './UserControllerTypes';
 
 export class UserController {
 	private userProps: CreateUserRequest;
@@ -8,7 +8,10 @@ export class UserController {
 	private userModel;
 	constructor(userProps: CreateUserRequest, db: typeof mongoose) {
 		this.userProps = userProps;
-		this.userModel = db.model('User', new mongoose.Schema(userSchema));
+		this.userModel = db.model<IUser, mongoose.Model<IUser>>(
+			'User',
+			userSchema
+		);
 	}
 
 	/**

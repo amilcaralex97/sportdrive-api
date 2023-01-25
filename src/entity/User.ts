@@ -1,15 +1,6 @@
 import { Schema, model, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-
-export interface IUser {
-	userName: string;
-	name: string;
-	password: string;
-	roleId: string;
-	userId: string;
-	createdAt?: Date;
-	updatedAt?: Date;
-}
+import { IUser } from '../controller/UserController/UserControllerTypes';
 
 export const userSchema = new Schema<IUser>(
 	{
