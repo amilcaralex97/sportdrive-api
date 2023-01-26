@@ -4,7 +4,6 @@ import { CreateUserRequest, IUser } from './UserControllerTypes';
 
 export class UserController {
 	private userProps: CreateUserRequest;
-	private db: typeof mongoose;
 	private userModel;
 	constructor(userProps: CreateUserRequest, db: typeof mongoose) {
 		this.userProps = userProps;

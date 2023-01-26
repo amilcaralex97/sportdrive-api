@@ -1,7 +1,13 @@
+import { Mockgoose } from 'mockgoose';
+import mongoose, { Model } from 'mongoose';
+
 import { UserController } from '../userController';
 import { userMocks } from './mocks';
-import mongoose from 'mongoose';
 import { userSchema } from '../../../entity/User';
+import { IUser } from '../UserControllerTypes';
+
+let mockgoose: Mockgoose = new Mockgoose(mongoose);
+let db: typeof mongoose;
 
 describe('User Controller', () => {
 	const mockReq = userMocks.createMockUserRequest();
@@ -17,15 +23,26 @@ describe('User Controller', () => {
 		roleId: mockReq.roleId,
 		userId: mockReq.userId,
 	};
-	let userController: UserController;
-	let db: typeof mongoose;
-	let userModel;
 
-	beforeEach(() => {
-		db = mongoose;
-		userModel = db.model('User', new mongoose.Schema(userSchema));
-		userController = new UserController({}, db);
-		jest.resetAllMocks();
+	let userController: UserController;
+	let userModel: Model<IUser>;
+
+	beforeAll(async () => {
+		await mockgoose.prepareStorage();
+		db = await mongoose.connect('mongodb://foobar/baz', {
+			serverSelectionTimeoutMS: 5000,
+		});
+		userModel = db.model<IUser, mongoose.Model<IUser>>('User', userSchema);
+		userController = new UserController(mockReq, db);
+	});
+
+	afterAll(async () => {
+		try {
+			await mongoose.connection.close();
+			await mockgoose.helper.reset();
+		} catch (error) {
+			console.log(error);
+		}
 	});
 	describe('createUser', () => {
 		it('Should create an user', async () => {});
@@ -33,11 +50,11 @@ describe('User Controller', () => {
 	});
 
 	describe('fetchUsers', () => {
+		beforeEach(() => {
+			userModel.find = jest.fn().mockResolvedValue({});
+		});
 		it('Should return all users', async () => {
-			jest.spyOn(userModel, 'find').mockImplementation(() =>
-				Promise.resolve(users)
-			);
-			const res = await users.fetchUsers();
+			const res = await userController.fetchUsers();
 			expect(res).toEqual({
 				message: 'Usuarios obtenidos con exitosamente',
 				users: mockResFindUsers,
@@ -45,9 +62,10 @@ describe('User Controller', () => {
 			});
 		});
 		it('Should catch error if it fails', async () => {
-			User.find = jest.fn().mockRejectedValueOnce({ error: 'error' });
-			const users = new UserController({});
-			const res = await users.fetchUsers();
+			userModel.find = jest
+				.fn()
+				.mockRejectedValueOnce({ error: 'error' });
+			const res = await userController.fetchUsers();
 			expect(res).toEqual({
 				message: 'Error al obtener los usuarios',
 				status: 500,
