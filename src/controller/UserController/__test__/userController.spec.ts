@@ -36,13 +36,14 @@ describe('User Controller', () => {
 		userController = new UserController(mockReq, db);
 	});
 
+	afterEach(() => {
+		jest.clearAllMocks();
+		jest.resetAllMocks();
+	});
+
 	afterAll(async () => {
-		try {
-			await mongoose.connection.close();
-			await mockgoose.helper.reset();
-		} catch (error) {
-			console.log(error);
-		}
+		await mongoose.connection.close();
+		await mockgoose.shutdown();
 	});
 	describe('createUser', () => {
 		it('Should create an user', async () => {});
@@ -51,7 +52,7 @@ describe('User Controller', () => {
 
 	describe('fetchUsers', () => {
 		beforeEach(() => {
-			userModel.find = jest.fn().mockResolvedValue({});
+			userModel.find = jest.fn().mockResolvedValue(mockResFindUsers);
 		});
 		it('Should return all users', async () => {
 			const res = await userController.fetchUsers();
