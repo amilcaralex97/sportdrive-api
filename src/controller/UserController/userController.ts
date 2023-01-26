@@ -19,7 +19,7 @@ export class UserController {
 	public async fetchUsers() {
 		let users;
 		try {
-			users = await this.userModel.find();
+			users = await this.userModel.find().populate('roleId');
 		} catch (error) {
 			return { status: 500, message: 'Error al obtener los usuarios' };
 		}
@@ -33,7 +33,36 @@ export class UserController {
 	/**
 	 * fetchUser
 	 */
-	public async fetchUser() {}
+	public async fetchUser() {
+		let user;
+		try {
+			user = await this.userModel
+				.findById(this.userProps.userId)
+				.populate('roleId');
+		} catch (error) {
+			return {
+				status: 500,
+				message: `Error al obtener el usuario ${
+					this.userProps.userId || ''
+				}`,
+			};
+		}
+
+		if (user) {
+			return {
+				status: 200,
+				message: 'Usuario obtenido exitosamente',
+				user,
+			};
+		}
+
+		return {
+			status: 400,
+			message: `Error al obtener el usuario ${
+				this.userProps.userId || ''
+			}`,
+		};
+	}
 
 	/**
 	 * createUser
