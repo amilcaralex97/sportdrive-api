@@ -3,6 +3,7 @@ import { IRole } from '../../entity/Role';
 export type RoleRequest = {
 	userAccess?: number;
 	receiptAccess?: number;
+	roleName?: string;
 	userId?: string;
 	roleId?: string;
 };

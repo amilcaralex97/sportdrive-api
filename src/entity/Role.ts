@@ -10,7 +10,7 @@ export interface IRole {
 	updatedAt?: Date;
 }
 
-const roleSchema = new Schema(
+export const roleSchema = new Schema(
 	{
 		userAccess: { type: Number, required: true, max: 8, min: 0 },
 		receiptAccess: { type: Number, required: true, max: 8, min: 0 },

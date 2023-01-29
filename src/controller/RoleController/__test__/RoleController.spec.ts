@@ -1,14 +1,15 @@
-import { Role } from '../../../entity/Role';
+import { Mockgoose } from 'mockgoose';
+import mongoose, { Model } from 'mongoose';
+
+import { IRole, roleSchema } from '../../../entity/Role';
 import { RoleController } from '../RoleController';
 import { roleMocks } from './mocks';
 
-Role.prototype.save = jest.fn();
+let mockgoose: Mockgoose = new Mockgoose(mongoose);
+let db: typeof mongoose;
 describe('RoleController', () => {
 	const mockReq = roleMocks.createRandomRoleReq();
-	const mockResFind = [
-		roleMocks.createRandomRole(),
-		roleMocks.createRandomRole(),
-	];
+	const mockResFind = Array.from({ length: 10 }, roleMocks.createRandomRole);
 	let roleId = roleMocks.createRandomRole().roleId;
 	const roleMock = {
 		receiptAccess: mockReq.receiptAccess,
@@ -16,16 +17,34 @@ describe('RoleController', () => {
 		users: [mockReq.userId],
 		roleId,
 	};
-	beforeEach(() => {
+
+	let roleController: RoleController;
+	let roleModel: Model<IRole>;
+
+	beforeAll(async () => {
+		await mockgoose.prepareStorage();
+		db = await mongoose.connect('mongodb://foobar/baz', {
+			serverSelectionTimeoutMS: 5000,
+		});
+		roleModel = db.model<IRole, mongoose.Model<IRole>>('Role', roleSchema);
+		roleController = new RoleController(mockReq, db);
+	});
+
+	afterEach(() => {
+		jest.clearAllMocks();
 		jest.resetAllMocks();
+	});
+
+	afterAll(async () => {
+		await mongoose.connection.close();
+		await mockgoose.shutdown();
 	});
 	describe('createRole', () => {
 		beforeEach(() => {
-			Role.prototype.save = jest.fn().mockReturnValue({});
+			roleModel.prototype.save = jest.fn().mockReturnValue({});
 		});
 		it('Should Create Role successfully', async () => {
-			Role.prototype.save = jest.fn().mockReturnValue(roleMock);
-			let roleController = new RoleController(mockReq);
+			roleModel.prototype.save = jest.fn().mockReturnValue(roleMock);
 			let role = await roleController.createRole();
 			expect(role).toEqual({
 				message: 'Rol creado exitosamente',
@@ -34,8 +53,10 @@ describe('RoleController', () => {
 			});
 		});
 		it('Should return an error > 400 when there is an error', async () => {
-			Role.prototype.save = jest.fn().mockRejectedValueOnce(roleMock);
-			let roleController = new RoleController(mockReq);
+			roleModel.prototype.save = jest
+				.fn()
+				.mockRejectedValueOnce(roleMock);
+
 			let role = await roleController.createRole();
 			expect(role).toEqual({
 				message: 'Error al crear rol',
@@ -46,11 +67,10 @@ describe('RoleController', () => {
 
 	describe('fetchRoles', () => {
 		beforeEach(() => {
-			Role.find = jest.fn().mockReturnValue([...mockResFind]);
+			roleModel.find = jest.fn().mockReturnValue([...mockResFind]);
 		});
 		it('Should return all roles', async () => {
-			const roles = new RoleController({});
-			const res = await roles.fetchRoles();
+			const res = await roleController.fetchRoles();
 			expect(res).toEqual({
 				message: 'Roles obtenidos con exitosamente',
 				roles: mockResFind,
@@ -58,9 +78,11 @@ describe('RoleController', () => {
 			});
 		});
 		it('Should return an error > 400 when there is an error', async () => {
-			Role.find = jest.fn().mockRejectedValueOnce({ error: 'error' });
-			const roles = new RoleController({});
-			const res = await roles.fetchRoles();
+			roleModel.find = jest
+				.fn()
+				.mockRejectedValueOnce({ error: 'error' });
+
+			const res = await roleController.fetchRoles();
 			expect(res).toEqual({
 				message: 'Error al obtener los roles',
 				status: 500,
@@ -70,14 +92,12 @@ describe('RoleController', () => {
 
 	describe('fetchRole', () => {
 		beforeEach(() => {
-			Role.findById = jest
+			roleModel.findById = jest
 				.fn()
 				.mockResolvedValue({ ...roleMock, roleId });
 		});
 		it('Should return a specific role', async () => {
 			let fetchRoleRequest = { ...mockReq, roleId };
-
-			let roleController = new RoleController(fetchRoleRequest);
 			let role = await roleController.fetchRole();
 			expect(role).toEqual({
 				message: 'Rol obtenido exitosamente',
@@ -86,26 +106,26 @@ describe('RoleController', () => {
 			});
 		});
 		it('Should return an error > 400 when there is an error', async () => {
-			Role.findById = jest.fn().mockRejectedValueOnce({ error: 'error' });
-			const roles = new RoleController({});
-			const res = await roles.fetchRole();
+			roleModel.findById = jest
+				.fn()
+				.mockRejectedValueOnce({ error: 'error' });
+			const res = await roleController.fetchRole();
 			expect(res).toEqual({
 				status: 500,
-				message: 'Error al obtener rol ',
+				message: `Error al obtener el rol ${roleId}`,
 			});
 		});
 	});
 
 	describe('updateRole', () => {
 		beforeEach(() => {
-			Role.findOneAndUpdate = jest
+			roleModel.findOneAndUpdate = jest
 				.fn()
 				.mockResolvedValue({ ...roleMock, roleId });
 		});
 		it('Should update a role', async () => {
 			let updateRoleRequest = { ...mockReq, roleId };
 
-			let roleController = new RoleController(updateRoleRequest);
 			let role = await roleController.updateRole();
 			expect(role).toEqual({
 				message: 'Rol actualizado exitosamente',
@@ -114,11 +134,10 @@ describe('RoleController', () => {
 			});
 		});
 		it('Should return an error when a role is not created', async () => {
-			Role.findOneAndUpdate = jest
+			roleModel.findOneAndUpdate = jest
 				.fn()
 				.mockRejectedValueOnce({ error: 'error' });
-			const roles = new RoleController({});
-			const res = await roles.updateRole();
+			const res = await roleController.updateRole();
 			expect(res).toEqual({
 				status: 500,
 				message: 'Error al actualizar rol',

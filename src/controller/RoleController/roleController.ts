@@ -1,10 +1,16 @@
-import { IRole, Role } from '../../entity/Role';
+import mongoose from 'mongoose';
+import { IRole, roleSchema } from '../../entity/Role';
 import { IRoleController, RoleRequest } from './RoleControllerTypes';
 
 export class RoleController implements IRoleController {
 	private roleProps: RoleRequest;
-	constructor(roleProps: RoleRequest) {
+	private roleModel;
+	constructor(roleProps: RoleRequest, db: typeof mongoose) {
 		this.roleProps = roleProps;
+		this.roleModel = db.model<IRole, mongoose.Model<IRole>>(
+			'Role',
+			roleSchema
+		);
 	}
 
 	/**
@@ -13,7 +19,7 @@ export class RoleController implements IRoleController {
 	public async fetchRoles() {
 		let roles;
 		try {
-			roles = await Role.find();
+			roles = await this.roleModel.find();
 		} catch (error) {
 			return { status: 500, message: 'Error al obtener los roles' };
 		}
@@ -28,9 +34,9 @@ export class RoleController implements IRoleController {
 	 * fetchRole
 	 */
 	public async fetchRole() {
-		let role: IRole | null;
+		let role;
 		try {
-			role = await Role.findById(this.roleProps?.roleId);
+			role = await this.roleModel.findById(this.roleProps?.roleId);
 		} catch (error) {
 			return {
 				status: 500,
@@ -58,7 +64,7 @@ export class RoleController implements IRoleController {
 	public async createRole() {
 		let role;
 		try {
-			role = new Role(this.roleProps);
+			role = new this.roleModel(this.roleProps);
 			role = await role.save();
 		} catch (error) {
 			return {
@@ -78,9 +84,9 @@ export class RoleController implements IRoleController {
 	 * updateRole
 	 */
 	public async updateRole() {
-		let role: IRole | null;
+		let role;
 		try {
-			role = await Role.findOneAndUpdate(
+			role = await this.roleModel.findOneAndUpdate(
 				{ roleId: this.roleProps.roleId },
 				{ $set: this.roleProps },
 				{ new: true }
