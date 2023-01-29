@@ -19,7 +19,7 @@ export class UserController {
 	public async fetchUsers() {
 		let users;
 		try {
-			users = await this.userModel.find().populate('roleId');
+			users = await this.userModel.find().populate('roleId').exec();
 		} catch (error) {
 			return { status: 500, message: 'Error al obtener los usuarios' };
 		}

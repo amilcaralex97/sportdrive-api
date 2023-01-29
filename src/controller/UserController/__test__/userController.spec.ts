@@ -52,8 +52,11 @@ describe('User Controller', () => {
 
 	describe('fetchUsers', () => {
 		beforeEach(() => {
-			userModel.find = jest.fn().mockResolvedValue(mockResFindUsers);
-			userModel.populate = jest.fn().mockResolvedValue({});
+			userModel.find = jest.fn().mockReturnValue({
+				populate: jest.fn().mockReturnValue({
+					exec: jest.fn().mockResolvedValue(mockResFindUsers),
+				}),
+			});
 		});
 		it('Should return all users', async () => {
 			const res = await userController.fetchUsers();
