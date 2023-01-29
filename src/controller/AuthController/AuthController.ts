@@ -1,8 +1,9 @@
 import { APIGatewayEvent } from 'aws-lambda';
 import { verify } from 'argon2';
-import { IUser, User } from '../../entity/User';
+import { User } from '../../entity/User';
 import { sign, SignOptions } from 'jsonwebtoken';
 import { AuthControllerInterface, SignInRequest } from './AuthControllerTypes';
+import { IUser } from '../UserController/UserControllerTypes';
 
 export class AuthController implements AuthControllerInterface {
 	private event: APIGatewayEvent;
