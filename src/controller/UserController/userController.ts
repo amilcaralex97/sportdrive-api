@@ -1,3 +1,4 @@
+import { hash } from 'argon2';
 import mongoose from 'mongoose';
 import { userSchema } from '../../entity/User';
 import { CreateUserRequest, IUser } from './UserControllerTypes';
@@ -38,7 +39,8 @@ export class UserController {
 		try {
 			user = await this.userModel
 				.findById(this.userProps.userId)
-				.populate('roleId');
+				.populate('roleId')
+				.exec();
 		} catch (error) {
 			return {
 				status: 500,
@@ -69,13 +71,14 @@ export class UserController {
 	 */
 	public async createUser() {
 		let user;
+		user = new this.userModel(this.userProps);
 		try {
-			user = new this.userModel(this.userProps);
+			user.password = await hash(user.password);
 			user = await user.save();
 		} catch (error) {
 			return {
 				status: 500,
-				message: 'Error al crear user',
+				message: 'Error al crear el usuario',
 			};
 		}
 		return {

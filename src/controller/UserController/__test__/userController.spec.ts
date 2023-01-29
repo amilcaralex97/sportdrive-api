@@ -1,5 +1,6 @@
 import { Mockgoose } from 'mockgoose';
 import mongoose, { Model } from 'mongoose';
+import * as argon2 from 'argon2';
 
 import { UserController } from '../userController';
 import { userMocks } from './mocks';
@@ -10,12 +11,13 @@ let mockgoose: Mockgoose = new Mockgoose(mongoose);
 let db: typeof mongoose;
 
 describe('User Controller', () => {
-	const mockReq = userMocks.createMockUserRequest();
+	const userId = userMocks.createMockUser().userId;
+	const mockReq = { ...userMocks.createMockUserRequest(), userId };
 	const mockResFindUsers = Array.from(
 		{ length: 10 },
 		userMocks.createMockUser
 	);
-	const userId = userMocks.createMockUser().userId;
+
 	const userMock = {
 		userName: mockReq.userName,
 		name: mockReq.name,
@@ -46,8 +48,38 @@ describe('User Controller', () => {
 		await mockgoose.shutdown();
 	});
 	describe('createUser', () => {
-		it('Should create an user', async () => {});
-		it('Should catch error while creating an user', async () => {});
+		beforeEach(() => {
+			jest.spyOn(argon2, 'hash').mockImplementation(() =>
+				Promise.resolve('hashed-password')
+			);
+			userModel.prototype.save = jest
+				.fn()
+				.mockReturnValue({ ...userMock, password: 'hashed-password' });
+		});
+
+		it('Should encrypt user password', async () => {
+			let res = await userController.createUser();
+			expect(res.user?.password).toEqual('hashed-password');
+		});
+
+		it('Should create an user', async () => {
+			let res = await userController.createUser();
+			expect(res).toEqual({
+				message: 'User creado exitosamente',
+				user: { ...userMock, password: 'hashed-password' },
+				status: 200,
+			});
+		});
+		it('Should catch error while creating an user', async () => {
+			userModel.prototype.save = jest
+				.fn()
+				.mockRejectedValueOnce({ error: 'error' });
+			const res = await userController.createUser();
+			expect(res).toEqual({
+				message: 'Error al crear el usuario',
+				status: 500,
+			});
+		});
 	});
 
 	describe('fetchUsers', () => {
@@ -79,8 +111,31 @@ describe('User Controller', () => {
 	});
 
 	describe('fetchUser', () => {
-		it('Should return a users', async () => {});
-		it('Should catch error if it fails', async () => {});
+		beforeEach(() => {
+			userModel.findById = jest.fn().mockReturnValue({
+				populate: jest.fn().mockReturnValue({
+					exec: jest.fn().mockResolvedValue(userMock),
+				}),
+			});
+		});
+		it('Should return a user', async () => {
+			const res = await userController.fetchUser();
+			expect(res).toEqual({
+				message: 'Usuario obtenido exitosamente',
+				user: userMock,
+				status: 200,
+			});
+		});
+		it('Should catch error if it fails', async () => {
+			userModel.findById = jest
+				.fn()
+				.mockRejectedValueOnce({ error: 'error' });
+			const res = await userController.fetchUser();
+			expect(res).toEqual({
+				message: `Error al obtener el usuario ${userId}`,
+				status: 500,
+			});
+		});
 	});
 
 	describe('updateUser', () => {

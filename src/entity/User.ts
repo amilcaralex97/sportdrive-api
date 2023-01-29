@@ -4,7 +4,7 @@ import { IUser } from '../controller/UserController/UserControllerTypes';
 
 export const userSchema = new Schema<IUser>(
 	{
-		userName: { type: String, required: true },
+		userName: { type: String, required: true, unique: true },
 		name: { type: String, required: true },
 		password: { type: String, required: true },
 		roleId: { type: String, ref: 'Role' },
