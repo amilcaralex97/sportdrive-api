@@ -60,6 +60,7 @@ describe('User Controller', () => {
 		});
 		it('Should return all users', async () => {
 			const res = await userController.fetchUsers();
+			console.log(mockResFindUsers);
 			expect(res).toEqual({
 				message: 'Usuarios obtenidos con exitosamente',
 				users: mockResFindUsers,
