@@ -99,9 +99,11 @@ describe('User Controller', () => {
 			});
 		});
 		it('Should catch error if it fails', async () => {
-			userModel.find = jest
-				.fn()
-				.mockRejectedValueOnce({ error: 'error' });
+			userModel.find = jest.fn().mockReturnValue({
+				populate: jest.fn().mockReturnValue({
+					exec: jest.fn().mockRejectedValue({ error: 'error' }),
+				}),
+			});
 			const res = await userController.fetchUsers();
 			expect(res).toEqual({
 				message: 'Error al obtener los usuarios',
@@ -127,9 +129,11 @@ describe('User Controller', () => {
 			});
 		});
 		it('Should catch error if it fails', async () => {
-			userModel.findById = jest
-				.fn()
-				.mockRejectedValueOnce({ error: 'error' });
+			userModel.findById = jest.fn().mockReturnValue({
+				populate: jest.fn().mockReturnValue({
+					exec: jest.fn().mockRejectedValue({ error: 'error' }),
+				}),
+			});
 			const res = await userController.fetchUser();
 			expect(res).toEqual({
 				message: `Error al obtener el usuario ${userId}`,
