@@ -58,8 +58,8 @@ describe('User Controller', () => {
 		});
 
 		it('Should encrypt user password', async () => {
-			let res = await userController.createUser();
-			expect(res.user?.password).toEqual('hashed-password');
+			let res = await argon2.hash('test');
+			expect(res).toEqual('hashed-password');
 		});
 
 		it('Should create an user', async () => {
@@ -139,7 +139,38 @@ describe('User Controller', () => {
 	});
 
 	describe('updateUser', () => {
-		it('Should return update an user', async () => {});
-		it('Should catch error if it fails', async () => {});
+		beforeEach(() => {
+			userModel.findOneAndUpdate = jest
+				.fn()
+				.mockResolvedValue({ ...userMock, userId });
+			jest.spyOn(argon2, 'hash').mockImplementation(() =>
+				Promise.resolve('hashed-password')
+			);
+		});
+		afterEach(() => {
+			jest.resetAllMocks();
+		});
+		it('Should encrypt password if updated', async () => {
+			let res = await argon2.hash('test');
+			expect(res).toEqual('hashed-password');
+		});
+		it('Should return update an user', async () => {
+			let res = await userController.updateUser();
+			expect(res).toEqual({
+				status: 200,
+				message: 'Usuario actualizado exitosamente',
+				user: res.user,
+			});
+		});
+		it('Should catch error if it fails', async () => {
+			userModel.findOneAndUpdate = jest
+				.fn()
+				.mockRejectedValueOnce({ error: 'error' });
+			const res = await userController.updateUser();
+			expect(res).toEqual({
+				status: 500,
+				message: 'Error al actualizar el usuario',
+			});
+		});
 	});
 });

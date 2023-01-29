@@ -91,5 +91,36 @@ export class UserController {
 	/**
 	 * updateUser
 	 */
-	public async updateUser() {}
+	public async updateUser() {
+		let user;
+		try {
+			if (this.userProps.password) {
+				this.userProps.password = await hash(this.userProps.password);
+			}
+			user = await this.userModel.findOneAndUpdate(
+				{ userId: this.userProps.roleId },
+				{ $set: this.userProps },
+				{ new: true }
+			);
+		} catch (error) {
+			return {
+				status: 500,
+				message: 'Error al actualizar el usuario',
+			};
+		}
+
+		if (user) {
+			return {
+				status: 200,
+				message: 'Usuario actualizado exitosamente',
+				user,
+			};
+		}
+		return {
+			status: 400,
+			message: `Error al obtener el usuario ${
+				this.userProps.userId || ''
+			}`,
+		};
+	}
 }
