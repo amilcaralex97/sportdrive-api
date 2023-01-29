@@ -3,9 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 export interface IRole {
 	roleId?: string;
+	roleName: string;
 	userAccess: number;
 	receiptAccess: number;
-	users?: string[];
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -14,12 +14,7 @@ const roleSchema = new Schema(
 	{
 		userAccess: { type: Number, required: true, max: 8, min: 0 },
 		receiptAccess: { type: Number, required: true, max: 8, min: 0 },
-		users: [
-			{
-				type: String,
-				ref: 'User',
-			},
-		],
+		roleName: { type: Number, required: true, unique: true },
 	},
 	{
 		_id: false,
