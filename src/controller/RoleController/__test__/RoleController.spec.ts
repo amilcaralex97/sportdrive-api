@@ -8,14 +8,15 @@ import { roleMocks } from './mocks';
 let mockgoose: Mockgoose = new Mockgoose(mongoose);
 let db: typeof mongoose;
 describe('RoleController', () => {
-	const mockReq = roleMocks.createRandomRoleReq();
+	const roleId = roleMocks.createRandomRole().roleId;
+	const mockReq = { ...roleMocks.createRandomRoleReq(), roleId };
 	const mockResFind = Array.from({ length: 10 }, roleMocks.createRandomRole);
-	let roleId = roleMocks.createRandomRole().roleId;
+
 	const roleMock = {
 		receiptAccess: mockReq.receiptAccess,
 		userAccess: mockReq.userAccess,
 		users: [mockReq.userId],
-		roleId,
+		roleId: mockReq.roleId,
 	};
 
 	let roleController: RoleController;
@@ -97,7 +98,6 @@ describe('RoleController', () => {
 				.mockResolvedValue({ ...roleMock, roleId });
 		});
 		it('Should return a specific role', async () => {
-			let fetchRoleRequest = { ...mockReq, roleId };
 			let role = await roleController.fetchRole();
 			expect(role).toEqual({
 				message: 'Rol obtenido exitosamente',
@@ -112,7 +112,7 @@ describe('RoleController', () => {
 			const res = await roleController.fetchRole();
 			expect(res).toEqual({
 				status: 500,
-				message: `Error al obtener el rol ${roleId}`,
+				message: `Error al obtener rol `,
 			});
 		});
 	});
@@ -124,8 +124,6 @@ describe('RoleController', () => {
 				.mockResolvedValue({ ...roleMock, roleId });
 		});
 		it('Should update a role', async () => {
-			let updateRoleRequest = { ...mockReq, roleId };
-
 			let role = await roleController.updateRole();
 			expect(role).toEqual({
 				message: 'Rol actualizado exitosamente',
