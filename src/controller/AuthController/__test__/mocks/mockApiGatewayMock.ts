@@ -1,7 +1,7 @@
 import { APIGatewayEvent } from 'aws-lambda';
 import { faker } from '@faker-js/faker';
 
-type Options = {
+export type Options = {
 	path?: string;
 	httpMethod?: 'GET' | 'POST' | 'PUT' | 'DELETE';
 	headers?: { [header: string]: string };

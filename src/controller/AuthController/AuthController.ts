@@ -1,15 +1,21 @@
 import { APIGatewayEvent } from 'aws-lambda';
 import { verify } from 'argon2';
-import { User } from '../../entity/User';
+import { User, userSchema } from '../../entity/User';
 import { sign, SignOptions } from 'jsonwebtoken';
 import { AuthControllerInterface, SignInRequest } from './AuthControllerTypes';
 import { IUser } from '../UserController/UserControllerTypes';
+import mongoose from 'mongoose';
 
 export class AuthController implements AuthControllerInterface {
-	private event: APIGatewayEvent;
+	private authRequest: SignInRequest;
+	private userModel;
 
-	constructor(event: APIGatewayEvent) {
-		this.event = event;
+	constructor(authRequest: SignInRequest, db: typeof mongoose) {
+		this.authRequest = authRequest;
+		this.userModel = db.model<IUser, mongoose.Model<IUser>>(
+			'User',
+			userSchema
+		);
 	}
 
 	/**
@@ -19,11 +25,10 @@ export class AuthController implements AuthControllerInterface {
 		let body: SignInRequest;
 		let jwtToken;
 		let user;
-		if (this.event.body) {
-			body = JSON.parse(this.event.body);
-			const { userName, password } = body;
+		if (this.authRequest) {
+			const { userName, password } = this.authRequest;
 			try {
-				user = await User.findOne({ userName });
+				user = await this.userModel.findOne({ userName });
 
 				if (!user) {
 					return {
