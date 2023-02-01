@@ -1,10 +1,9 @@
-import { APIGatewayEvent } from 'aws-lambda';
 import { verify } from 'argon2';
-import { User, userSchema } from '../../entity/User';
+import mongoose from 'mongoose';
 import { sign, SignOptions } from 'jsonwebtoken';
+import { userSchema } from '../../entity/User';
 import { AuthControllerInterface, SignInRequest } from './AuthControllerTypes';
 import { IUser } from '../UserController/UserControllerTypes';
-import mongoose from 'mongoose';
 
 export class AuthController implements AuthControllerInterface {
 	private authRequest: SignInRequest;
