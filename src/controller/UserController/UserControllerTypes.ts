@@ -24,9 +24,10 @@ export type UserDTO = {
 	userId?: string;
 };
 
-export interface IRoleController {
+export interface IUserController {
 	fetchUsers: () => Promise<UserDTO>;
 	fetchUser: () => Promise<UserDTO>;
+	fetchUserByUsername: () => Promise<UserDTO>;
 	createUser: () => Promise<UserDTO>;
 	updateUser: () => Promise<UserDTO>;
 }

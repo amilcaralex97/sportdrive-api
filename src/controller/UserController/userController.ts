@@ -1,9 +1,13 @@
 import { hash } from 'argon2';
 import mongoose from 'mongoose';
 import { userSchema } from '../../entity/User';
-import { CreateUserRequest, IUser } from './UserControllerTypes';
+import {
+	CreateUserRequest,
+	IUser,
+	IUserController,
+} from './UserControllerTypes';
 
-export class UserController {
+export class UserController implements IUserController {
 	private userProps: CreateUserRequest;
 	private userModel;
 	constructor(userProps: CreateUserRequest, db: typeof mongoose) {
@@ -62,6 +66,41 @@ export class UserController {
 			status: 400,
 			message: `Error al obtener el usuario ${
 				this.userProps.userId || ''
+			}`,
+		};
+	}
+
+	/**
+	 * fetchUserByUsername
+	 */
+	public async fetchUserByUsername() {
+		let user;
+		try {
+			user = await this.userModel
+				.findOne({ userName: this.userProps.userName })
+				.populate('roleId')
+				.exec();
+		} catch (error) {
+			return {
+				status: 500,
+				message: `Error al obtener el usuario ${
+					this.userProps.userName || ''
+				}`,
+			};
+		}
+
+		if (user) {
+			return {
+				status: 200,
+				message: 'Usuario obtenido exitosamente',
+				user,
+			};
+		}
+
+		return {
+			status: 400,
+			message: `Error al obtener el usuario ${
+				this.userProps.userName || ''
 			}`,
 		};
 	}

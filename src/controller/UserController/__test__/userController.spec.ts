@@ -144,15 +144,34 @@ describe('User Controller', () => {
 
 	describe('fetchUserByUsername', () => {
 		beforeEach(() => {
-			userModel.findById = jest.fn().mockReturnValue({
+			userModel.findOne = jest.fn().mockReturnValue({
 				populate: jest.fn().mockReturnValue({
 					exec: jest.fn().mockResolvedValue(userMock),
 				}),
 			});
 		});
-		it('Should get an user by username', async () => {});
+		it('Should get an user by username', async () => {
+			const res = await userController.fetchUserByUsername();
 
-		it('Should catch error if it fails', async () => {});
+			expect(res).toEqual({
+				message: 'Usuario obtenido exitosamente',
+				status: 200,
+				user: userMock,
+			});
+		});
+
+		it('Should catch error if it fails', async () => {
+			userModel.findOne = jest.fn().mockReturnValue({
+				populate: jest.fn().mockReturnValue({
+					exec: jest.fn().mockRejectedValue({ error: 'error' }),
+				}),
+			});
+			const res = await userController.fetchUserByUsername();
+			expect(res).toEqual({
+				message: `Error al obtener el usuario ${mockReq.userName}`,
+				status: 500,
+			});
+		});
 	});
 
 	describe('updateUser', () => {
