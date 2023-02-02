@@ -4,17 +4,17 @@ import { sign, SignOptions } from 'jsonwebtoken';
 import { userSchema } from '../../entity/User';
 import { AuthInteractorInterface, SignInRequest } from './AuthInteractorTypes';
 import { IUser } from '../../controller/UserController/UserControllerTypes';
+import { UserController } from '../../controller/UserController/userController';
+import { APIGatewayEvent } from 'aws-lambda';
+import { eventParser } from '../../helpers/jsonHelper';
 
 export class AuthInteractor implements AuthInteractorInterface {
-	private authRequest: SignInRequest;
-	private userModel;
+	private event;
+	private conn;
 
-	constructor(authRequest: SignInRequest, db: typeof mongoose) {
-		this.authRequest = authRequest;
-		this.userModel = db.model<IUser, mongoose.Model<IUser>>(
-			'User',
-			userSchema
-		);
+	constructor(event: APIGatewayEvent, db: typeof mongoose) {
+		this.event = eventParser(event);
+		this.conn = db;
 	}
 
 	/**
