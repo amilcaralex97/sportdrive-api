@@ -142,6 +142,19 @@ describe('User Controller', () => {
 		});
 	});
 
+	describe('fetchUserByUsername', () => {
+		beforeEach(() => {
+			userModel.findById = jest.fn().mockReturnValue({
+				populate: jest.fn().mockReturnValue({
+					exec: jest.fn().mockResolvedValue(userMock),
+				}),
+			});
+		});
+		it('Should get an user by username', async () => {});
+
+		it('Should catch error if it fails', async () => {});
+	});
+
 	describe('updateUser', () => {
 		beforeEach(() => {
 			userModel.findOneAndUpdate = jest

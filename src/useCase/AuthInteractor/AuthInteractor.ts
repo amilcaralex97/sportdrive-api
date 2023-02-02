@@ -2,10 +2,10 @@ import { verify } from 'argon2';
 import mongoose from 'mongoose';
 import { sign, SignOptions } from 'jsonwebtoken';
 import { userSchema } from '../../entity/User';
-import { AuthControllerInterface, SignInRequest } from './AuthInteractorTypes';
+import { AuthInteractorInterface, SignInRequest } from './AuthInteractorTypes';
 import { IUser } from '../../controller/UserController/UserControllerTypes';
 
-export class AuthController implements AuthControllerInterface {
+export class AuthInteractor implements AuthInteractorInterface {
 	private authRequest: SignInRequest;
 	private userModel;
 

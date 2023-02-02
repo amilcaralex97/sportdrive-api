@@ -16,7 +16,7 @@ export type VerifyDTO = {
 	isVerified: boolean;
 };
 
-export interface AuthControllerInterface {
+export interface AuthInteractorInterface {
 	signIn: () => Promise<SignInDTO>;
 	verify: () => VerifyDTO;
 }
