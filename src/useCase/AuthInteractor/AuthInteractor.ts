@@ -1,42 +1,36 @@
 import { verify } from 'argon2';
 import mongoose from 'mongoose';
+import { APIGatewayEvent } from 'aws-lambda';
 import { sign, SignOptions } from 'jsonwebtoken';
-import { userSchema } from '../../entity/User';
+
 import { AuthInteractorInterface, SignInRequest } from './AuthInteractorTypes';
 import { IUser } from '../../controller/UserController/UserControllerTypes';
 import { UserController } from '../../controller/UserController/userController';
-import { APIGatewayEvent } from 'aws-lambda';
 import { eventParser } from '../../helpers/jsonHelper';
 
 export class AuthInteractor implements AuthInteractorInterface {
-	private event;
-	private conn;
+	private userController;
+	private body: SignInRequest;
 
 	constructor(event: APIGatewayEvent, db: typeof mongoose) {
-		this.event = eventParser(event);
-		this.conn = db;
+		this.userController = new UserController(eventParser(event), db);
+		this.body = eventParser(event);
 	}
 
 	/**
 	 * signIn
 	 */
 	public async signIn() {
-		let body: SignInRequest;
 		let jwtToken;
-		let user;
-		if (this.authRequest) {
-			const { userName, password } = this.authRequest;
-			try {
-				user = await this.userModel.findOne({ userName });
+		let res;
+		try {
+			res = await this.userController.fetchUserByUsername();
 
-				if (!user) {
-					return {
-						status: 401,
-						message: 'Contraseña o Usuario Inválidos',
-					};
-				}
-
-				const validPassword = await verify(user.password, password);
+			if (res && res.user) {
+				const validPassword = await verify(
+					res.user.password,
+					this.body.password
+				);
 
 				if (!validPassword) {
 					return {
@@ -45,17 +39,19 @@ export class AuthInteractor implements AuthInteractorInterface {
 					};
 				}
 
-				jwtToken = this.generateToken(user);
-			} catch (error) {
-				return { status: 500, message: 'Error en login' };
+				jwtToken = this.generateToken(res.user);
+
+				return {
+					token: jwtToken,
+					userId: res.user.userId,
+					status: 200,
+					message: 'Login exitoso',
+				};
 			}
-			return {
-				token: jwtToken,
-				userId: user.userId,
-				status: 200,
-				message: 'Login exitoso',
-			};
+		} catch (error) {
+			return { status: 500, message: 'Error en login' };
 		}
+
 		return { status: 500, message: 'Error en login' };
 	}
 
