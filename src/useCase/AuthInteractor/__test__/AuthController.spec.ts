@@ -1,47 +1,27 @@
 import { Mockgoose } from 'mockgoose';
 import mongoose from 'mongoose';
+import * as argon2 from 'argon2';
+import * as jsonwebtoken from 'jsonwebtoken';
 
 import { AuthInteractor } from '../AuthInteractor';
 import { authMocks } from './mocks';
 import { UserController } from '../../../controller/UserController/userController';
+import { userMocks } from '../../../controller/UserController/__test__/mocks';
 
 let mockgoose: Mockgoose = new Mockgoose(mongoose);
 let db: typeof mongoose;
 
-let mockFetchUserByUsername = jest.fn().mockResolvedValue({
-	user: { userId: 'user1', password: 'hashedpassword1' },
-});
-
-let mockVerify = jest.fn().mockResolvedValue(true);
-let mockSign = jest.fn().mockResolvedValue('jwt_token');
-
-jest.mock('../../../controller/UserController/userController', () => {
-	return {
-		UserController: jest.fn().mockImplementation(() => {
-			return {
-				fetchUserByUsername: mockFetchUserByUsername,
-			};
-		}),
-	};
-});
-
-jest.mock('argon2', () => {
-	return {
-		verify: mockVerify,
-	};
-});
-
-jest.mock('jsonwebtoken', () => {
-	return {
-		sign: mockSign,
-	};
-});
-
 describe('AuthInteractor', () => {
 	let authInteractor: AuthInteractor;
+	let userController: UserController;
+
+	let userId = userMocks.createMockUser().userId;
+	let mockUser = { ...userMocks.createMockUser(), userId };
+
 	const event = authMocks.mockAPIGatewayEvent({
-		body: '{"userName":"test1", "password":"test1"}',
+		body: JSON.stringify(mockUser),
 	});
+	const mockReq = { ...userMocks.createMockUserRequest(), userId };
 
 	beforeAll(async () => {
 		await mockgoose.prepareStorage();
@@ -49,6 +29,7 @@ describe('AuthInteractor', () => {
 			serverSelectionTimeoutMS: 5000,
 		});
 		authInteractor = new AuthInteractor(event, db);
+		userController = new UserController(mockReq, db);
 	});
 
 	afterEach(() => {
@@ -61,7 +42,23 @@ describe('AuthInteractor', () => {
 		await mockgoose.shutdown();
 	});
 
+	let jsonwebtokenSpy: jest.SpyInstance;
+	let argon2Spy: jest.SpyInstance;
 	describe('signIn', () => {
+		beforeEach(() => {
+			argon2Spy = jest
+				.spyOn(argon2, 'verify')
+				.mockImplementation(() => Promise.resolve(true));
+
+			jsonwebtokenSpy = jest
+				.spyOn(jsonwebtoken, 'sign')
+				.mockImplementation(() => Promise.resolve('hashed-password'));
+
+			userController.fetchUserByUsername = jest
+				.fn()
+				.mockResolvedValue(mockUser);
+		});
+
 		it('should return a jwt token and a userId when sign in successfully', async () => {
 			const result = await authInteractor.signIn();
 			expect(result).toEqual({
@@ -72,6 +69,7 @@ describe('AuthInteractor', () => {
 			});
 		});
 		it('should return 401 when password is invalid', async () => {
+			argon2Spy.mockReturnValue(false);
 			const result = await authInteractor.signIn();
 			expect(result).toEqual({
 				status: 401,
@@ -80,6 +78,9 @@ describe('AuthInteractor', () => {
 		});
 
 		it('should return 500 when fetching user fails', async () => {
+			userController.fetchUserByUsername = jest
+				.fn()
+				.mockRejectedValue({ error: 'error' });
 			const result = await authInteractor.signIn();
 			expect(result).toEqual({ status: 500, message: 'Error en login' });
 		});
