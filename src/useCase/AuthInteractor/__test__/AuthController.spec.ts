@@ -1,5 +1,5 @@
 import { Mockgoose } from 'mockgoose';
-import mongoose from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import * as argon2 from 'argon2';
 import * as jsonwebtoken from 'jsonwebtoken';
 
@@ -7,6 +7,8 @@ import { AuthInteractor } from '../AuthInteractor';
 import { authMocks } from './mocks';
 import { UserController } from '../../../controller/UserController/userController';
 import { userMocks } from '../../../controller/UserController/__test__/mocks';
+import { IUser } from '../../../controller/UserController/UserControllerTypes';
+import { userSchema } from '../../../entity/User';
 
 let mockgoose: Mockgoose = new Mockgoose(mongoose);
 let db: typeof mongoose;
@@ -14,6 +16,7 @@ let db: typeof mongoose;
 describe('AuthInteractor', () => {
 	let authInteractor: AuthInteractor;
 	let userController: UserController;
+	let userModel: Model<IUser>;
 
 	let userId = userMocks.createMockUser().userId;
 	let mockUser = { ...userMocks.createMockUser(), userId };
@@ -28,6 +31,7 @@ describe('AuthInteractor', () => {
 		db = await mongoose.connect('mongodb://foobar/baz', {
 			serverSelectionTimeoutMS: 5000,
 		});
+		userModel = db.model<IUser, mongoose.Model<IUser>>('User', userSchema);
 		authInteractor = new AuthInteractor(event, db);
 		userController = new UserController(mockReq, db);
 	});
@@ -57,6 +61,12 @@ describe('AuthInteractor', () => {
 			userController.fetchUserByUsername = jest
 				.fn()
 				.mockResolvedValue(mockUser);
+
+			userModel.findOne = jest.fn().mockReturnValue({
+				populate: jest.fn().mockReturnValue({
+					exec: jest.fn().mockResolvedValue(mockUser),
+				}),
+			});
 		});
 
 		it('should return a jwt token and a userId when sign in successfully', async () => {
