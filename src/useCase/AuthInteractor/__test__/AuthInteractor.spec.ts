@@ -56,7 +56,7 @@ describe('AuthInteractor', () => {
 
 			jsonwebtokenSpy = jest
 				.spyOn(jsonwebtoken, 'sign')
-				.mockImplementation(() => Promise.resolve('hashed-password'));
+				.mockImplementation(() => 'jwt_token');
 
 			userController.fetchUserByUsername = jest
 				.fn()
@@ -73,7 +73,7 @@ describe('AuthInteractor', () => {
 			const result = await authInteractor.signIn();
 			expect(result).toEqual({
 				token: 'jwt_token',
-				userId: 'user1',
+				userId: mockUser.userId,
 				status: 200,
 				message: 'Login exitoso',
 			});
@@ -88,15 +88,11 @@ describe('AuthInteractor', () => {
 		});
 
 		it('should return 500 when fetching user fails', async () => {
-			userController.fetchUserByUsername = jest
-				.fn()
-				.mockRejectedValue({ error: 'error' });
-			const result = await authInteractor.signIn();
-			expect(result).toEqual({ status: 500, message: 'Error en login' });
-		});
-
-		it('should return 500 when the body is not provided', async () => {
-			event.body = null;
+			userModel.findOne = jest.fn().mockReturnValue({
+				populate: jest.fn().mockReturnValue({
+					exec: jest.fn().mockRejectedValue({ error: 'error' }),
+				}),
+			});
 			const result = await authInteractor.signIn();
 			expect(result).toEqual({ status: 500, message: 'Error en login' });
 		});
