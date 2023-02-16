@@ -4,7 +4,7 @@ import { join } from 'path';
 
 type LambdaProps = {
 	env: string;
-	model: string;
+	interactor: string;
 	method: string;
 };
 
@@ -22,7 +22,7 @@ export class GenericLambda {
 	}
 
 	private createLambda() {
-		const lambdaId = `${this.props.env}-${this.props.model}`;
+		const lambdaId = `${this.props.env}-${this.props.interactor}`;
 		return new NodejsFunction(this.stack, lambdaId, {
 			entry: join(
 				__dirname,
@@ -30,11 +30,14 @@ export class GenericLambda {
 				'src',
 				'infrastructure',
 				'Lambda',
-				this.props.model,
+				this.props.interactor,
 				this.props.method
 			),
 			handler: 'handler',
 			functionName: lambdaId,
+			environment: {
+				DEV_ENV: this.props.env,
+			},
 		});
 	}
 }
