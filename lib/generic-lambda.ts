@@ -1,9 +1,10 @@
 import { Stack } from 'aws-cdk-lib';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { join } from 'path';
+import { Dictionary } from '../src/helpers/envHelper';
 
 type LambdaProps = {
-	env: string;
+	env_vars: Dictionary;
 	interactor: string;
 	method: string;
 };
@@ -22,7 +23,7 @@ export class GenericLambda {
 	}
 
 	private createLambda() {
-		const lambdaId = `${this.props.env}-${this.props.interactor}`;
+		const lambdaId = `${this.props.env_vars['env']}-${this.props.interactor}`;
 		return new NodejsFunction(this.stack, lambdaId, {
 			entry: join(
 				__dirname,
@@ -35,9 +36,7 @@ export class GenericLambda {
 			),
 			handler: 'handler',
 			functionName: lambdaId,
-			environment: {
-				DEV_ENV: this.props.env,
-			},
+			environment: this.props.env_vars,
 		});
 	}
 }
