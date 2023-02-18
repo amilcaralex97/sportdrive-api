@@ -5,7 +5,6 @@ import {
 } from 'aws-lambda';
 import { AuthInteractor } from '../../../useCase/AuthInteractor/AuthInteractor';
 import { dbConnection } from '../../connection';
-import { SignInDTO } from '../../../useCase/AuthInteractor/AuthInteractorTypes';
 
 async function handler(
 	event: APIGatewayProxyEvent,
