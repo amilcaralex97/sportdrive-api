@@ -30,9 +30,9 @@ describe('parseEnv', () => {
 PORT=3000`;
 
 		// Create a temporary .env file for testing
-		await fs.writeFile('.env', envContents, 'utf8');
+		await fs.writeFile('.env.test', envContents, 'utf8');
 
-		const envDictionary = await parseEnv('.env');
+		const envDictionary = await parseEnv('.env.test');
 
 		expect(envDictionary).toEqual({
 			API_KEY: 'abc123',
@@ -40,7 +40,7 @@ PORT=3000`;
 		});
 
 		// Delete the temporary .env file after testing
-		await fs.unlink('.env');
+		await fs.unlink('.env.test');
 	});
 
 	it('should handle errors when reading .env file', async () => {
