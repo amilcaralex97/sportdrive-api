@@ -24,6 +24,11 @@ export class AuthInteractor implements AuthInteractorInterface {
 		let jwtToken;
 		let res;
 		try {
+			if (process.env.SEED_USERNAME) {
+				const users = await this.userController.fetchUsers();
+				if (!users.users?.length) {
+				}
+			}
 			res = await this.userController.fetchUserByUsername();
 
 			if (res && res.user) {
