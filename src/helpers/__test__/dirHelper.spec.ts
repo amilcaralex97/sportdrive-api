@@ -6,7 +6,10 @@ describe('getFilesInDirectory', () => {
 			`${__dirname}/../__test__/mocks/dirHelper`
 		);
 		expect(files).toEqual(
-			expect.arrayContaining(['file1.txt', 'file2.txt'])
+			expect.arrayContaining([
+				'C:\\Users\\amilc\\OneDrive\\Documentos\\node-projects\\sportdrive-api\\src\\helpers\\__test__\\mocks\\dirHelper\\file1.txt',
+				'C:\\Users\\amilc\\OneDrive\\Documentos\\node-projects\\sportdrive-api\\src\\helpers\\__test__\\mocks\\dirHelper\\file2.txt',
+			])
 		);
 	});
 
