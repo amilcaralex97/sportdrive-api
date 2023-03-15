@@ -26,7 +26,7 @@ describe("RoleController", () => {
     await mockgoose.prepareStorage();
     db = await mongoose.connect("mongodb://foobar/baz", {
       serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 500,
+      connectTimeoutMS: 120000,
     });
     roleModel = db.model<IRole, mongoose.Model<IRole>>("Role", roleSchema);
     roleController = new RoleController(mockReq, db);
@@ -38,7 +38,7 @@ describe("RoleController", () => {
   });
 
   afterAll(async () => {
-    await mongoose.connection.close();
+    await db.connection.close();
     await mockgoose.shutdown();
   });
   describe("createRole", () => {

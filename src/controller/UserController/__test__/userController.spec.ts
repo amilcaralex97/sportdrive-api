@@ -30,7 +30,7 @@ describe("User Controller", () => {
     await mockgoose.prepareStorage();
     db = await mongoose.connect("mongodb://foobar/baz", {
       serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 20000,
+      connectTimeoutMS: 120000,
     });
     userModel = db.model<IUser, mongoose.Model<IUser>>("User", userSchema);
     userController = new UserController(mockReq, db);
@@ -42,7 +42,7 @@ describe("User Controller", () => {
   });
 
   afterAll(async () => {
-    await mongoose.connection.close();
+    await db.connection.close();
     await mockgoose.shutdown();
   });
   describe("createUser", () => {

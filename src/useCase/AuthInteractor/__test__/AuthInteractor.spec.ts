@@ -30,7 +30,7 @@ describe("AuthInteractor", () => {
     await mockgoose.prepareStorage();
     db = await mongoose.connect("mongodb://foobar/baz", {
       serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 500,
+      connectTimeoutMS: 120000,
     });
     userModel = db.model<IUser, mongoose.Model<IUser>>("User", userSchema);
     authInteractor = new AuthInteractor(event, db);
@@ -43,7 +43,7 @@ describe("AuthInteractor", () => {
   });
 
   afterAll(async () => {
-    await mongoose.connection.close();
+    await db.connection.close();
     await mockgoose.shutdown();
   });
 
