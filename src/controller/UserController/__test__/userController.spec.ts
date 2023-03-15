@@ -42,7 +42,7 @@ describe("User Controller", () => {
   });
 
   afterAll(async () => {
-    await db.connection.close();
+    await db.connection.close(); //shutdown fix
     await mockgoose.shutdown();
   });
   describe("createUser", () => {
