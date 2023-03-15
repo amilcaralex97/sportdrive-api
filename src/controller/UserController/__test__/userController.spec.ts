@@ -2,7 +2,7 @@ import { Mockgoose } from "mockgoose";
 import mongoose, { Model } from "mongoose";
 import * as argon2 from "argon2";
 
-import { UserController } from "../userController";
+import { UserController } from "../UserController";
 import { userMocks } from "./mocks";
 import { userSchema } from "../../../entity/User";
 import { IUser } from "../UserControllerTypes";
@@ -29,7 +29,8 @@ describe("User Controller", () => {
   beforeAll(async () => {
     await mockgoose.prepareStorage();
     db = await mongoose.connect("mongodb://foobar/baz", {
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 20000,
     });
     userModel = db.model<IUser, mongoose.Model<IUser>>("User", userSchema);
     userController = new UserController(mockReq, db);
