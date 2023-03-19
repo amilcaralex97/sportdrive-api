@@ -7,8 +7,8 @@ describe('getFilesInDirectory', () => {
 		);
 		expect(files).toEqual(
 			expect.arrayContaining([
-				'C:\\Users\\amilc\\OneDrive\\Documentos\\node-projects\\sportdrive-api\\src\\helpers\\__test__\\mocks\\dirHelper\\file1.txt',
-				'C:\\Users\\amilc\\OneDrive\\Documentos\\node-projects\\sportdrive-api\\src\\helpers\\__test__\\mocks\\dirHelper\\file2.txt',
+				'/home/amilcaralex/personalProjects/sp-api/src/helpers/__test__/mocks/dirHelper/file1.txt',
+				'/home/amilcaralex/personalProjects/sp-api/src/helpers/__test__/mocks/dirHelper/file2.txt',
 			])
 		);
 	});
@@ -23,7 +23,7 @@ describe('getFilesInDirectory', () => {
 		await expect(
 			getFilesInDirectory('./invalid-directory')
 		).rejects.toThrow(
-			"ENOENT: no such file or directory, scandir 'C:\\Users\\amilc\\OneDrive\\Documentos\\node-projects\\sportdrive-api\\invalid-directory'"
+			"ENOENT: no such file or directory, scandir './invalid-directory'"
 		);
 	});
 });
