@@ -1,17 +1,17 @@
-import { Mockgoose } from "mockgoose";
 import mongoose, { Model } from "mongoose";
 import * as argon2 from "argon2";
 import * as jsonwebtoken from "jsonwebtoken";
+import { MongoMemoryServer } from "mongodb-memory-server";
 
 import { AuthInteractor } from "../AuthInteractor";
 import { authMocks } from "./mocks";
-import { UserController } from "../../../controller/UserController/UserController";
 import { userMocks } from "../../../controller/UserController/__test__/mocks";
 import { IUser } from "../../../controller/UserController/UserControllerTypes";
 import { userSchema } from "../../../entity/User";
+import { UserController } from "../../../controller/UserController/userController";
 
-let mockgoose: Mockgoose = new Mockgoose(mongoose);
 let db: typeof mongoose;
+let mongod: MongoMemoryServer;
 
 describe("AuthInteractor", () => {
   let authInteractor: AuthInteractor;
@@ -27,10 +27,11 @@ describe("AuthInteractor", () => {
   const mockReq = { ...userMocks.createMockUserRequest(), userId };
 
   beforeAll(async () => {
-    await mockgoose.prepareStorage();
-    db = await mongoose.connect("mongodb://foobar/baz", {
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 120000,
+    mongod = await MongoMemoryServer.create();
+    const mongoUri = mongod.getUri();
+    db = await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 1000,
+      connectTimeoutMS: 500,
     });
     userModel = db.model<IUser, mongoose.Model<IUser>>("User", userSchema);
     authInteractor = new AuthInteractor(event, db);
@@ -44,7 +45,7 @@ describe("AuthInteractor", () => {
 
   afterAll(async () => {
     await db.connection.close(); //shutdown fix
-    await mockgoose.shutdown();
+    await mongod.stop();
   });
 
   let jsonwebtokenSpy: jest.SpyInstance;

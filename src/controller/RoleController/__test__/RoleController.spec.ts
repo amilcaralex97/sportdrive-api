@@ -1,11 +1,10 @@
-import { Mockgoose } from "mockgoose";
 import mongoose, { Model } from "mongoose";
+import { MongoMemoryServer } from "mongodb-memory-server";
 
 import { IRole, roleSchema } from "../../../entity/Role";
-import { RoleController } from "../RoleController";
+import { RoleController } from "../roleController";
 import { roleMocks } from "./mocks";
 
-let mockgoose: Mockgoose = new Mockgoose(mongoose);
 let db: typeof mongoose;
 describe("RoleController", () => {
   const roleId = roleMocks.createRandomRole().roleId;
@@ -21,12 +20,14 @@ describe("RoleController", () => {
 
   let roleController: RoleController;
   let roleModel: Model<IRole>;
+  let mongod: MongoMemoryServer;
 
   beforeAll(async () => {
-    await mockgoose.prepareStorage();
-    db = await mongoose.connect("mongodb://foobar/baz", {
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 120000,
+    mongod = await MongoMemoryServer.create();
+    const mongoUri = mongod.getUri();
+    db = await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 1000,
+      connectTimeoutMS: 500,
     });
     roleModel = db.model<IRole, mongoose.Model<IRole>>("Role", roleSchema);
     roleController = new RoleController(mockReq, db);
@@ -38,8 +39,8 @@ describe("RoleController", () => {
   });
 
   afterAll(async () => {
-    await db.connection.close(); //shutdown fix
-    await mockgoose.shutdown();
+    await mongoose.connection.close(); //shutdown fix
+    await mongod.stop();
   });
   describe("createRole", () => {
     beforeEach(() => {

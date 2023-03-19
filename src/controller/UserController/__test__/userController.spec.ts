@@ -1,11 +1,11 @@
 import mongoose, { Model } from "mongoose";
 import * as argon2 from "argon2";
+import { MongoMemoryServer } from "mongodb-memory-server";
 
 import { UserController } from "../userController";
 import { userMocks } from "./mocks";
 import { userSchema } from "../../../entity/User";
 import { IUser } from "../UserControllerTypes";
-import { MongoMemoryServer } from "mongodb-memory-server";
 
 let db: typeof mongoose;
 

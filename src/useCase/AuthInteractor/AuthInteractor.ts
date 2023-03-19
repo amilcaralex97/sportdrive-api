@@ -5,8 +5,8 @@ import { sign, SignOptions } from "jsonwebtoken";
 
 import { AuthInteractorInterface, SignInRequest } from "./AuthInteractorTypes";
 import { IUser } from "../../controller/UserController/UserControllerTypes";
-import { UserController } from "../../controller/UserController/UserController";
 import { eventParser } from "../../helpers/jsonHelper";
+import { UserController } from "../../controller/UserController/userController";
 
 export class AuthInteractor implements AuthInteractorInterface {
   private userController;
