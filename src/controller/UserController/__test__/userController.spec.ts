@@ -1,13 +1,12 @@
-import { Mockgoose } from "mockgoose";
 import mongoose, { Model } from "mongoose";
 import * as argon2 from "argon2";
 
-import { UserController } from "../UserController";
+import { UserController } from "../userController";
 import { userMocks } from "./mocks";
 import { userSchema } from "../../../entity/User";
 import { IUser } from "../UserControllerTypes";
+import { MongoMemoryServer } from "mongodb-memory-server";
 
-let mockgoose: Mockgoose = new Mockgoose(mongoose);
 let db: typeof mongoose;
 
 describe("User Controller", () => {
@@ -25,12 +24,14 @@ describe("User Controller", () => {
 
   let userController: UserController;
   let userModel: Model<IUser>;
+  let mongod: MongoMemoryServer;
 
   beforeAll(async () => {
-    await mockgoose.prepareStorage();
-    db = await mongoose.connect("mongodb://foobar/baz", {
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 120000,
+    mongod = await MongoMemoryServer.create();
+    const mongoUri = mongod.getUri();
+    db = await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 1000,
+      connectTimeoutMS: 500,
     });
     userModel = db.model<IUser, mongoose.Model<IUser>>("User", userSchema);
     userController = new UserController(mockReq, db);
@@ -42,8 +43,8 @@ describe("User Controller", () => {
   });
 
   afterAll(async () => {
-    await db.connection.close(); //shutdown fix
-    await mockgoose.shutdown();
+    await mongoose.disconnect();
+    await mongod.stop();
   });
   describe("createUser", () => {
     beforeEach(() => {
