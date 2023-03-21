@@ -7,14 +7,17 @@ import { AuthInteractorInterface, SignInRequest } from "./AuthInteractorTypes";
 import { IUser } from "../../controller/UserController/UserControllerTypes";
 import { eventParser } from "../../helpers/jsonHelper";
 import { UserController } from "../../controller/UserController/userController";
+import { parseEnv } from "../../helpers/envHelper";
 
 export class AuthInteractor implements AuthInteractorInterface {
   private userController;
   private body: SignInRequest;
+  private db: typeof mongoose;
 
   constructor(event: APIGatewayEvent, db: typeof mongoose) {
     this.userController = new UserController(eventParser(event), db);
     this.body = eventParser(event);
+    this.db = db;
   }
 
   /**
@@ -25,8 +28,13 @@ export class AuthInteractor implements AuthInteractorInterface {
     let res;
     try {
       if (process.env.SEED_USERNAME) {
+        let user;
         const users = await this.userController.fetchUsers();
         if (!users.users?.length) {
+          const seedUserInstance = new UserController(
+            { ...(await parseEnv()) },
+            this.db
+          );
         }
       }
       res = await this.userController.fetchUserByUsername();
@@ -59,6 +67,8 @@ export class AuthInteractor implements AuthInteractorInterface {
 
     return { status: 500, message: "Error en login" };
   }
+
+  private loginValidator() {}
 
   private generateToken(user: IUser) {
     const signInOptions: SignOptions = {
