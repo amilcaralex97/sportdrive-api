@@ -8,7 +8,9 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy-dev": "cdk deploy ENVIRONMENT=dev",
+    "deploy-prod": "cdk deploy ENVIRONMENT=prod"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
