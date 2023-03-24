@@ -19,8 +19,8 @@ export type CreateUserRequest = {
 export type UserDTO = {
   status: number;
   message: string;
-  roles?: IUser[];
-  role?: IUser;
+  users?: IUser[];
+  user?: IUser;
   userId?: string;
   updatedAt?: string;
   createdAt?: string;
