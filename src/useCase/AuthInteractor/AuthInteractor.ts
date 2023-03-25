@@ -15,6 +15,7 @@ import {
 import { eventParser } from "../../helpers/jsonHelper";
 import { UserController } from "../../controller/UserController/userController";
 import { parseEnv } from "../../helpers/envHelper";
+import { RoleController } from "../../controller/RoleController/roleController";
 
 export class AuthInteractor implements AuthInteractorInterface {
   private userController;
@@ -35,16 +36,10 @@ export class AuthInteractor implements AuthInteractorInterface {
     try {
       if (process.env.SEED_USERNAME) {
         const users = await this.userController.fetchUsers();
-        if (!users.users?.length) {
-          const seedUserInstance = new UserController(
-            { ...(await parseEnv()) },
-            this.db
-          );
-
-          res = await seedUserInstance.createUser();
-
+        if (users.users?.length) {
+          res = await this.createSeedUser();
           if (res && res.user) {
-            return this.loginValidator(res);
+            return await this.loginValidator(res);
           }
         }
       }
@@ -123,5 +118,37 @@ export class AuthInteractor implements AuthInteractorInterface {
         isVerified: false,
       };
     }
+  }
+
+  /**
+   * verify
+   */
+  private async createSeedUser(): Promise<UserDTO> {
+    const seedUser = await parseEnv();
+    const seedRoleInstance = new RoleController(
+      {
+        roleName: seedUser["SEED_ROLENAME"],
+        receiptAccess: parseInt(seedUser["SEED_ROLEACCESS"]),
+        userAccess: parseInt(seedUser["SEED_ROLEACCESS"]),
+      },
+      this.db
+    );
+
+    seedRoleInstance
+      .createRole()
+      .then((role) => {
+        const seedUserInstance = new UserController(
+          {
+            userName: seedUser["SEED_USERNAME"],
+            password: seedUser["SEED_PASSWORD"],
+            name: seedUser["SEED_USERNAME"],
+            roleId: role.role?.roleId!,
+          },
+          this.db
+        );
+      })
+      .catch((error) => {
+        return {};
+      });
   }
 }

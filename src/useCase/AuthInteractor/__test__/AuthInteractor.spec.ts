@@ -20,6 +20,7 @@ describe("AuthInteractor", () => {
 
   let userId = userMocks.createMockUser().userId;
   let mockUser = { ...userMocks.createMockUser(), userId };
+  const mockResFindUsers = Array.from({ length: 10 }, userMocks.createMockUser);
 
   const event = authMocks.mockAPIGatewayEvent({
     body: JSON.stringify(mockUser),
@@ -64,9 +65,17 @@ describe("AuthInteractor", () => {
         .fn()
         .mockResolvedValue(mockUser);
 
+      userController.fetchUsers = jest.fn().mockResolvedValue([]);
+
       userModel.findOne = jest.fn().mockReturnValue({
         populate: jest.fn().mockReturnValue({
           exec: jest.fn().mockResolvedValue(mockUser),
+        }),
+      });
+
+      userModel.find = jest.fn().mockReturnValue({
+        populate: jest.fn().mockReturnValue({
+          exec: jest.fn().mockResolvedValue([]),
         }),
       });
     });
@@ -97,6 +106,19 @@ describe("AuthInteractor", () => {
       });
       const result = await authInteractor.signIn();
       expect(result).toEqual({ status: 500, message: "Error en login" });
+    });
+
+    it("Should seed an user in case there are no users in the db", async () => {
+      process.env.SEED_USERNAME = "seedUserTest";
+      process.env.SEED_PASSWORD = "seedPasswordTest";
+
+      const result = await authInteractor.signIn();
+      expect(result).toEqual({
+        token: "jwt_token",
+        userId: mockUser.userId,
+        status: 200,
+        message: "Login exitoso",
+      });
     });
   });
 });
