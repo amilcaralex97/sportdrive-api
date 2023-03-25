@@ -51,6 +51,7 @@ export class AuthInteractor implements AuthInteractorInterface {
       res = await this.userController.fetchUserByUsername();
 
       if (res && res.user) {
+        return await this.loginValidator(res);
       }
     } catch (error) {
       return { status: 500, message: "Error en login" };
