@@ -14,7 +14,6 @@ describe("RoleController", () => {
   const roleMock = {
     receiptAccess: mockReq.receiptAccess,
     userAccess: mockReq.userAccess,
-    users: [mockReq.userId],
     roleId: mockReq.roleId,
   };
 
