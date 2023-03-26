@@ -36,11 +36,12 @@ export class AuthInteractor implements AuthInteractorInterface {
     try {
       if (process.env.SEED_USERNAME) {
         const users = await this.userController.fetchUsers();
-        if (users.users?.length) {
+        if (!users.users?.length) {
           res = await this.createSeedUser();
-          if (res && res.user) {
+          if (res && res.user && res.status === 200) {
             return await this.loginValidator(res);
           }
+          return { status: 500, message: "Error en login" };
         }
       }
       res = await this.userController.fetchUserByUsername();
@@ -124,31 +125,39 @@ export class AuthInteractor implements AuthInteractorInterface {
    * verify
    */
   private async createSeedUser(): Promise<UserDTO> {
-    const seedUser = await parseEnv();
-    const seedRoleInstance = new RoleController(
-      {
-        roleName: seedUser["SEED_ROLENAME"],
-        receiptAccess: parseInt(seedUser["SEED_ROLEACCESS"]),
-        userAccess: parseInt(seedUser["SEED_ROLEACCESS"]),
-      },
-      this.db
-    );
+    try {
+      const seedUser = await parseEnv();
+      const seedRoleInstance = new RoleController(
+        {
+          roleName: seedUser["SEED_ROLENAME"],
+          receiptAccess: parseInt(seedUser["SEED_ROLEACCESS"]),
+          userAccess: parseInt(seedUser["SEED_ROLEACCESS"]),
+        },
+        this.db
+      );
 
-    seedRoleInstance
-      .createRole()
-      .then((role) => {
-        const seedUserInstance = new UserController(
-          {
-            userName: seedUser["SEED_USERNAME"],
-            password: seedUser["SEED_PASSWORD"],
-            name: seedUser["SEED_USERNAME"],
-            roleId: role.role?.roleId!,
-          },
-          this.db
-        );
-      })
-      .catch((error) => {
-        return {};
-      });
+      const role = await seedRoleInstance.createRole();
+
+      const seedUserInstance = new UserController(
+        {
+          userName: seedUser["SEED_USERNAME"],
+          password: seedUser["SEED_PASSWORD"],
+          name: seedUser["SEED_USERNAME"],
+          roleId: role.role?.roleId!,
+        },
+        this.db
+      );
+
+      const user = await seedUserInstance.createUser();
+
+      return user;
+    } catch (error) {
+      // Maneja el error lanzado por createUser
+      console.error("Error al crear el usuario:", error);
+      return {
+        status: 500,
+        message: "Error al crear el usuario",
+      };
+    }
   }
 }
