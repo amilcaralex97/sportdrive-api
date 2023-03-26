@@ -120,5 +120,18 @@ describe("AuthInteractor", () => {
         message: "Login exitoso",
       });
     });
+
+    it("Should return an error in case seeding the user fails", async () => {
+      process.env.SEED_USERNAME = "seedUserTest";
+      process.env.SEED_PASSWORD = "seedPasswordTest";
+
+      const result = await authInteractor.signIn();
+      expect(result).toEqual({
+        token: "jwt_token",
+        userId: mockUser.userId,
+        status: 200,
+        message: "Login exitoso",
+      });
+    });
   });
 });
