@@ -9,6 +9,7 @@ import { userMocks } from "../../../controller/UserController/__test__/mocks";
 import { IUser } from "../../../controller/UserController/UserControllerTypes";
 import { userSchema } from "../../../entity/User";
 import { UserController } from "../../../controller/UserController/userController";
+import { RoleController } from "../../../controller/RoleController/roleController";
 
 let db: typeof mongoose;
 let mongod: MongoMemoryServer;
@@ -108,9 +109,13 @@ describe("AuthInteractor", () => {
       expect(result).toEqual({ status: 500, message: "Error en login" });
     });
 
+    /*     roleController = new RoleController(mockReq, db);
+     */
     it("Should seed an user in case there are no users in the db", async () => {
       process.env.SEED_USERNAME = "seedUserTest";
       process.env.SEED_PASSWORD = "seedPasswordTest";
+      process.env.SEED_ROLENAME = "seedRoleTest";
+      process.env.SEED_ROLEACCESS = "8";
 
       const result = await authInteractor.signIn();
       expect(result).toEqual({
@@ -124,13 +129,13 @@ describe("AuthInteractor", () => {
     it("Should return an error in case seeding the user fails", async () => {
       process.env.SEED_USERNAME = "seedUserTest";
       process.env.SEED_PASSWORD = "seedPasswordTest";
+      process.env.SEED_ROLENAME = "seedRoleTest";
+      process.env.SEED_ROLEACCESS = "seedAccessTest";
 
       const result = await authInteractor.signIn();
       expect(result).toEqual({
-        token: "jwt_token",
-        userId: mockUser.userId,
-        status: 200,
-        message: "Login exitoso",
+        message: "Error en login",
+        status: 500,
       });
     });
   });
