@@ -10,6 +10,8 @@ import { IUser } from "../../../controller/UserController/UserControllerTypes";
 import { userSchema } from "../../../entity/User";
 import { UserController } from "../../../controller/UserController/userController";
 import { RoleController } from "../../../controller/RoleController/roleController";
+import { IRole, Role, roleSchema } from "../../../entity/Role";
+import { roleMocks } from "../../../controller/RoleController/__test__/mocks";
 
 let db: typeof mongoose;
 let mongod: MongoMemoryServer;
@@ -18,15 +20,19 @@ describe("AuthInteractor", () => {
   let authInteractor: AuthInteractor;
   let userController: UserController;
   let userModel: Model<IUser>;
+  let roleController: RoleController;
+  let roleModel: Model<IRole>;
 
   let userId = userMocks.createMockUser().userId;
+  const mockReq = { ...userMocks.createMockUserRequest(), userId };
   let mockUser = { ...userMocks.createMockUser(), userId };
-  const mockResFindUsers = Array.from({ length: 10 }, userMocks.createMockUser);
+
+  let roleId = roleMocks.createRandomRoleReq().roleId;
+  const roleMockReq = { ...roleMocks.createRandomRoleReq(), roleId };
 
   const event = authMocks.mockAPIGatewayEvent({
     body: JSON.stringify(mockUser),
   });
-  const mockReq = { ...userMocks.createMockUserRequest(), userId };
 
   beforeAll(async () => {
     mongod = await MongoMemoryServer.create();
@@ -35,9 +41,13 @@ describe("AuthInteractor", () => {
       serverSelectionTimeoutMS: 1000,
       connectTimeoutMS: 500,
     });
+
     userModel = db.model<IUser, mongoose.Model<IUser>>("User", userSchema);
+    roleModel = db.model<IRole, mongoose.Model<IRole>>("Role", roleSchema);
+
     authInteractor = new AuthInteractor(event, db);
     userController = new UserController(mockReq, db);
+    roleController = new RoleController({}, db);
   });
 
   afterEach(() => {
@@ -79,6 +89,11 @@ describe("AuthInteractor", () => {
           exec: jest.fn().mockResolvedValue([]),
         }),
       });
+
+      roleModel.prototype.save = jest.fn().mockReturnValue({});
+      userModel.prototype.save = jest
+        .fn()
+        .mockReturnValue({ ...mockUser, password: "hashed-password" });
     });
 
     it("should return a jwt token and a userId when sign in successfully", async () => {
@@ -109,13 +124,55 @@ describe("AuthInteractor", () => {
       expect(result).toEqual({ status: 500, message: "Error en login" });
     });
 
-    /*     roleController = new RoleController(mockReq, db);
-     */
     it("Should seed an user in case there are no users in the db", async () => {
       process.env.SEED_USERNAME = "seedUserTest";
       process.env.SEED_PASSWORD = "seedPasswordTest";
       process.env.SEED_ROLENAME = "seedRoleTest";
       process.env.SEED_ROLEACCESS = "8";
+
+      userController = new UserController(
+        {
+          ...mockReq,
+          userId,
+          userName: process.env.SEED_USERNAME,
+          password: process.env.SEED_PASSWORD,
+        },
+        db
+      );
+
+      userController.createUser = jest.fn().mockRejectedValueOnce({
+        message: "User creado exitosamente",
+        user: {
+          ...mockReq,
+          userId,
+          userName: process.env.SEED_USERNAME,
+          password: process.env.SEED_PASSWORD,
+        },
+        status: 200,
+      });
+
+      roleController = new RoleController(
+        {
+          ...roleMockReq,
+          roleId,
+          roleName: process.env.SEED_ROLENAME,
+          userAccess: parseInt(process.env.SEED_ROLEACCESS),
+          receiptAccess: parseInt(process.env.SEED_ROLEACCESS),
+        },
+        db
+      );
+
+      roleController.createRole = jest.fn().mockRejectedValueOnce({
+        message: "Rol creado exitosamente",
+        role: {
+          ...roleMockReq,
+          roleId,
+          roleName: process.env.SEED_ROLENAME,
+          userAccess: parseInt(process.env.SEED_ROLEACCESS),
+          receiptAccess: parseInt(process.env.SEED_ROLEACCESS),
+        },
+        status: 200,
+      });
 
       const result = await authInteractor.signIn();
       expect(result).toEqual({
@@ -130,7 +187,7 @@ describe("AuthInteractor", () => {
       process.env.SEED_USERNAME = "seedUserTest";
       process.env.SEED_PASSWORD = "seedPasswordTest";
       process.env.SEED_ROLENAME = "seedRoleTest";
-      process.env.SEED_ROLEACCESS = "seedAccessTest";
+      process.env.SEED_ROLEACCESS = "8";
 
       const result = await authInteractor.signIn();
       expect(result).toEqual({
