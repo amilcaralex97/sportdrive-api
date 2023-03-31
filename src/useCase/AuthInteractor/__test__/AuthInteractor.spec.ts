@@ -10,7 +10,7 @@ import { IUser } from "../../../controller/UserController/UserControllerTypes";
 import { userSchema } from "../../../entity/User";
 import { UserController } from "../../../controller/UserController/userController";
 import { RoleController } from "../../../controller/RoleController/roleController";
-import { IRole, Role, roleSchema } from "../../../entity/Role";
+import { IRole, roleSchema } from "../../../entity/Role";
 import { roleMocks } from "../../../controller/RoleController/__test__/mocks";
 
 let db: typeof mongoose;
