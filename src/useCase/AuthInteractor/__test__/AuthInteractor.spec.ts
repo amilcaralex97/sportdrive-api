@@ -140,7 +140,7 @@ describe("AuthInteractor", () => {
         db
       );
 
-      userController.createUser = jest.fn().mockRejectedValueOnce({
+      userController.createUser = jest.fn().mockReturnValueOnce({
         message: "User creado exitosamente",
         user: {
           ...mockReq,
@@ -162,7 +162,7 @@ describe("AuthInteractor", () => {
         db
       );
 
-      roleController.createRole = jest.fn().mockRejectedValueOnce({
+      roleController.createRole = jest.fn().mockReturnValueOnce({
         message: "Rol creado exitosamente",
         role: {
           ...roleMockReq,
@@ -184,10 +184,46 @@ describe("AuthInteractor", () => {
     });
 
     it("Should return an error in case seeding the user fails", async () => {
+      roleModel.prototype.save = jest.fn().mockRejectedValueOnce({});
+      userModel.prototype.save = jest
+        .fn()
+        .mockRejectedValueOnce({ ...mockUser, password: "hashed-password" });
+
       process.env.SEED_USERNAME = "seedUserTest";
       process.env.SEED_PASSWORD = "seedPasswordTest";
       process.env.SEED_ROLENAME = "seedRoleTest";
       process.env.SEED_ROLEACCESS = "8";
+
+      userController = new UserController(
+        {
+          ...mockReq,
+          userId,
+          userName: process.env.SEED_USERNAME,
+          password: process.env.SEED_PASSWORD,
+        },
+        db
+      );
+
+      userController.createUser = jest.fn().mockRejectedValueOnce({
+        message: "Error al crear el usuario",
+        status: 500,
+      });
+
+      roleController = new RoleController(
+        {
+          ...roleMockReq,
+          roleId,
+          roleName: process.env.SEED_ROLENAME,
+          userAccess: parseInt(process.env.SEED_ROLEACCESS),
+          receiptAccess: parseInt(process.env.SEED_ROLEACCESS),
+        },
+        db
+      );
+
+      roleController.createRole = jest.fn().mockRejectedValueOnce({
+        message: "Error al crear rol",
+        status: 500,
+      });
 
       const result = await authInteractor.signIn();
       expect(result).toEqual({
