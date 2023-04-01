@@ -15,12 +15,5 @@ export class SportdriveServerlessStack extends cdk.Stack {
 
     // Create a sub-resource for login endpoints
     const login = authentication.addResource("login");
-
-    // The code that defines your stack goes here
-
-    // example resource
-    // const queue = new sqs.Queue(this, 'SportdriveServerlessQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
   }
 }
