@@ -1,7 +1,9 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { LambdaIntegration, RestApi } from "aws-cdk-lib/aws-apigateway";
+import { join } from "path";
 import { GenericLambda } from "./generic-lambda";
+import { parseEnv } from "../src/helpers/envHelper";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class SportdriveServerlessStack extends cdk.Stack {
@@ -15,5 +17,22 @@ export class SportdriveServerlessStack extends cdk.Stack {
 
     // Create a sub-resource for login endpoints
     const login = authentication.addResource("login");
+    const loginIntegration = new LambdaIntegration(
+      GenericLambda.createSingleLambda(
+        parseEnv(process.env.ENVIRONMENT),
+        join(
+          __dirname,
+          "..",
+          "src",
+          "infrastructure",
+          "Lambda",
+          this.props.interactor,
+          this.props.method
+        ),
+        "",
+        this.api
+      )
+    );
+    login.addMethod("POST", loginIntegration);
   }
 }
