@@ -4,7 +4,6 @@ import { LambdaIntegration, RestApi } from "aws-cdk-lib/aws-apigateway";
 import { join } from "path";
 import { GenericLambda } from "./generic-lambda";
 import { parseEnv } from "../src/helpers/envHelper";
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class SportdriveServerlessStack extends cdk.Stack {
   private api = new RestApi(this, "sport-drive-api");
@@ -12,27 +11,27 @@ export class SportdriveServerlessStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // auth parent resource
-    const authentication = this.api.root.addResource("auth");
-
-    // Create a sub-resource for login endpoints
-    const login = authentication.addResource("login");
-    const loginIntegration = new LambdaIntegration(
-      GenericLambda.createSingleLambda(
-        parseEnv(process.env.ENVIRONMENT),
+    (async () => {
+      const env = await parseEnv(process.env.ENVIRONMENT);
+      const lambda = await GenericLambda.createSingleLambda(
+        env,
         join(
           __dirname,
           "..",
           "src",
           "infrastructure",
           "Lambda",
-          this.props.interactor,
-          this.props.method
+          "AuthInteractor",
+          "SignIn.ts"
         ),
-        "",
-        this.api
-      )
-    );
-    login.addMethod("POST", loginIntegration);
+        "Login",
+        this
+      );
+      const lambdaIntegration = new LambdaIntegration(lambda);
+
+      const authentication = this.api.root.addResource("auth");
+      const login = authentication.addResource("login");
+      login.addMethod("POST", lambdaIntegration);
+    })();
   }
 }
